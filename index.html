@@ -4,113 +4,15 @@
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="mobile-web-app-capable" content="yes">
-	<title>Physics Thingy</title>
-
-    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-
-	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.1/jquery.mobile.min.css" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.1/jquery.mobile.min.js"></script>
-
-	<script src='3rdParty/spectrum.js'></script>
-	<link rel='stylesheet' href='3rdParty/spectrum.css' />
-
+	<title>Landing</title>
 	<link rel="stylesheet" href="styles.css">
-
-	<script src="toolbars.js"></script>
-	<script src="physics.js"></script>
-	<script src="draw.js"></script>
-	<script src="tools.js"></script>
-	<script src="shapes.js"></script>
-	<script src="userInteraction.js"></script>
-    <script src="utilityFuncs.js"></script>
-	<script src="main.js"></script>
 </head>
 
 <body>
-	<button data-inline="true" id='settings' class='pushLeft' type='button'>&#9776; Settings</button>
-	<button data-inline="true" id='tools' class='pushRight' type='button'>Tools &#9776;</button>
-    <button data-inline="true" id='clearScreen' class='pushRight' type='button'>Clear Screen</button>
-	<form class='pushLeft'>
-		<input id="pause" type="button" value="Pause" name="button" data-mini="true">
-
-		<label for="colorPicker">Ball Color:</label>
-		<input type='text' id="colorPicker" data-role="none" value='grey'/>
-
-		<fieldset data-role="controlgroup" data-mini="true">
-			<input type="radio" name="radio" id="manual" />
-			<label for="manual">Manual Color</label>
-
-			<input type="radio" name="radio" id="randomColor" checked="checked" />
-			<label for="randomColor">Random Color</label>
-
-			<input type="radio" name="radio" id="colorByHeight" />
-			<label for="colorByHeight">Color By Height</label>
-
-			<input type="radio" name="radio" id="colorByVelocity" />
-			<label for="colorByVelocity">Color By Velocity</label>
-
-			<input type="radio" name="radio" id="colorByRainbow" />
-			<label for="colorByRainbow">Rainbow Mode!</label>
-		</fieldset>
-
-		<label for='smileyFace'>Smiley Faces?!</label>
-		<input id="smileyFace" type="checkbox" name="checkbox" data-mini="true">
-
-		<label for='showVelocityLines'>Show Velocity Lines</label>
-		<input id="showVelocityLines" type="checkbox" name="checkbox" data-mini="true">
-
-		<label for="radiusSlide">Ball Radius:</label>
-		<input type="range" name="radiusSlide" id="radiusSlide" value="25" min="1" max="50" step="1" data-mini="true"/>
-		<label for='randomRadius'>Random Radius</label>
-		<input id="randomRadius" type="checkbox" checked='true' name="randomColor" data-mini="true">
-
-		<label for="gravSlide">Gravity:</label>
-		<input type="range" name="gravSlide" id="gravSlide" value="3" min="0" max="5" step="0.1" data-mini="true"/>
-
-		<label for="gravAngleSlide">Gravity Angle (in radians):</label>
-		<input type="range" name="gravAngleSlide" id="gravAngleSlide" value="0.5" min="0" max="2" step="0.01" data-mini="true"/>
-
-		<label for="simSpeedSlide">Sim Speed:</label>
-		<input type="range" name="simSpeedSlide" id="simSpeedSlide" value="1" min="0.1" max="5" step="0.1" data-mini="true"/>
-
-		<label for="maxObjSlide">Maximum Objects:</label>
-		<input type="range" name="maxObjSlide" id="maxObjSlide" value="10" min="1" max="50" step="1" data-mini="true"/>
-
-		<label for="accel">Use Accelerometer for Gravity</label>
-		<input id="accel" type="checkbox" name="checkbox" data-mini="true">
-		<input id="calibrateAccel" type="button" value="Calibrate Accelerometer" name="clear" data-mini="true">
-
-		<label for="dontReDrawCanvas">Don't Re-Draw Canvas (Get's trippy fast)</label>
-		<input id="dontReDrawCanvas" type="checkbox" name="checkbox" data-mini="true">
-
-		<label for="debug">Show Debug Vars</label>
-		<input id="debug" type="checkbox" name="checkbox" data-mini="true">
-
-        <br/><input id="savePNG" type="button" value="Save Canvas as PNG" name="button" data-mini="true">
-		<br/>
-		<div class='textBox'>
-			<u><b>Keybindings:</b></u><br/>
-			SPACE - Pause <br/>
-
-		</div>
-		<br/>
-		<div class='textBox'>
-			<u><b>TODO:</b></u><br/>
-			- Rewrite User Interaction Code <br/>
-			&emsp; 1. Selecting *Multiple* Objects<br/>
-			- Physics Engine - Duh <br/>
-			&emsp; 1. Collision<br/>
-			&emsp; 2. Rotation<br/>
-			&emsp; 3. Mass<br/>
-		</div>
-		<br/><b>Copyright Daniel Prilik 2014</b>
-
-	</form>
-	<div id='toolbar' class='pushRight'>
-<!--		Tools append here-->
-	</div>
-
-    <canvas id='mainCanvas' class='pushLeft'></canvas>
+	<h1>This is just a landing</h1>
+	<p>Here are some links to some of my projects: </p>
+	<ul>
+		<li>Physics Thingy</li>
+	</ul>
 </body>
 </html>
