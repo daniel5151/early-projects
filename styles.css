@@ -1,3 +1,9 @@
 body {
     font-family:Myriad Pro, sans-serif;
+    background-color: OldLace;
+    padding:1em;
+}
+
+h1 {
+    text-decoration: underline;
 }
