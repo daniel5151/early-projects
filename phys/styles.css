@@ -1,86 +1,76 @@
 body {
-    font-family:Myriad Pro, sans-serif;
+	font-family: Myriad Pro, sans-serif;
 	margin: auto;
-	overflow:hidden;
+	overflow: hidden;
 }
-
 #mainCanvas {
-/*    display: none; */
+	/*    display: none; */
 	position: absolute;
 	z-index: 0;
 	cursor: none;
 }
-
 form {
-	background-color:#7dd8ff;
+	background-color: #7dd8ff;
 	width: 15em;
-	padding:1em 1em 1em 1em;
+	padding: 1em 1em 1em 1em;
 	overflow-y: auto;
 	position: absolute;
-	z-index:1;
-	top:0;
+	z-index: 1;
+	top: 0;
 	bottom: 0;
-	left:-17em;
+	left: -17em;
 	user-select: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
 }
 label {
 	font-weight: bold;
 }
-
 #toolbar {
-	background-color:#ffb97d;
+	background-color: #ffb97d;
 	width: 7em;
-	padding:0.5em 0.5em 0.5em 0.5em;
+	padding: 0.5em 0.5em 0.5em 0.5em;
 	overflow-y: auto;
 	position: absolute;
-	z-index:1;
-	top:0;
+	z-index: 1;
+	top: 0;
 	bottom: 0;
-	right:-8em;
+	right: -8em;
 	user-select: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
 }
-
 #settings {
 	position: absolute;
 	z-index: 2;
-	left:0.5em;
+	left: 0.5em;
 }
-
 #clearScreen {
 	position: absolute;
 	z-index: 2;
 	right: 0em;
-    top: 3em;
+	top: 3em;
 }
-
 #tools {
 	position: absolute;
-	right:0;
+	right: 0;
 	z-index: 3;
 }
-
-.push {
-
-}
-
-.toolButton {
-	width:6em;
-	height:4em;
+.push {} .toolButton {
+	width: 6em;
+	height: 4em;
 	background-color: white;
 	border-radius: 10%;
 	display: table-cell;
 	text-align: center;
 	vertical-align: middle;
-	border:1px black solid;
+	border: 1px black solid;
 }
-
-a:link {text-decoration:none;}
+a:link {
+	text-decoration: none;
+}
 .textBox {
 	background-color: white;
 	border-radius: 1em;
