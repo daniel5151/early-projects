@@ -1,0 +1,27 @@
+<html>
+	<head>
+		<title>Music Analyser</title>
+		
+		<script type="text/javascript" src="main.js"></script>
+        
+		<script type="text/javascript" src="js/three.min.js"></script>
+		<script type="text/javascript" src="js/OrbitControls.js"></script>
+		
+		<link rel="stylesheet" href="styles.css">
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		<input type="file" id="fileInput">
+		
+		<button onclick="getMicrophone()">Microphone</button>
+		
+		<audio id='audioNode' controls
+            src="music.mp3">
+            Your user agent does not support the HTML5 Audio element.
+        </audio>
+		
+		<p> Drag music files into the window, or choose a file. </p>
+		
+		<script type="text/javascript" src="renderer3d.js"></script>
+	</body>
+</html>

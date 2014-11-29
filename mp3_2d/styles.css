@@ -1,0 +1,33 @@
+body {
+	font-family: Myriad Pro, sans-serif;
+	overflow: hidden;
+	margin: 0px;
+}
+
+input {
+	display: block;
+	position: absolute;
+    right: -5em;
+    top: 1em;
+}
+
+p {
+	display: block;
+	position: absolute;
+    left: 1em;
+    top: 0em;
+}
+
+button {
+	display: block;
+	position: absolute;
+    right: 1em;
+    top: 3em;
+}
+
+audio {
+    display: block;
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+}
