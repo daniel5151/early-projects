@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Conway's Game of Life</title>
+
+    <script src="js/jquery-1.10.1.min.js"></script>
+    <script src="js/jquery-migrate-1.2.1.min.js"></script>
+
+	<link rel="stylesheet" href="css/jquery.mobile.min.css" />
+	<script src="js/jquery.mobile.min.js"></script>
+	
+    <script src="input.js"></script>
+    <script src="utilityFunctions.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+    <script src="main.js"></script>
+</head>
+
+<body>
+    <div id='container'>
+        <h1>Conway's Game of Life</h1>
+        <p id='gen'>Generation: 0</p>
+        <canvas id='mainCanvas'></canvas>
+        <form id="myForm" method="post"> 
+            <input type="button" value="Pause" id='pause' data-mini="true"/>
+            <input type="button" value="Reset" id='reset' data-mini="true"/>
+            <label>
+                <input type="checkbox" name="random" id='random' data-mini="true"/>Random
+            </label>
+            <div class='sliders'>
+                <label for="speed">Speed</label>
+                <input type="range" name="speed" id="speed" value="1" min="0.1" max="2" step="0.1" data-mini="true"/>
+            </div>
+            <input type="button" value="Load" id='load' data-mini="true"/>
+            <input type="button" value="Save" id='save' data-mini="true"/>
+        </form>
+        <div id='descriptionOut'>
+        <div id='descriptionIn'>
+            &emsp;<b><em>Conway's Game of Life</em></b> is a simple cellular automa created by John Conway in 1970. Beautiful and intricate patterns are
+            created from some very simple rules:
+            <ol>
+                <li>Any live cell with fewer than two live neighbours dies, as if caused by under-population.</li>
+                <li>Any live cell with two or three live neighbours lives on to the next generation.</li>
+                <li>Any live cell with more than three live neighbours dies, as if by overcrowding.</li>
+                <li>Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.</li>
+            </ol>
+            This is a simple inplementation of the GOL in JavaScript and HTML5 Canvas.
+            <br><br>
+            Made by Daniel Prilik - 2014
+        </div>
+        </div>
+    </div>
+</body>
+
+</html>
