@@ -1,0 +1,33 @@
+body {
+    font-family: Myriad Pro, sans-serif;
+    margin: auto;
+    overflow: hidden;
+}
+
+#input {
+    width:50%;
+    display: block;
+    margin: auto;
+    text-align: center;
+    border: 3px grey dashed;
+    border-radius: 2em;
+    padding-bottom: 1em;
+    margin-top: 1em;
+}
+
+input {
+    margin-top: 1em;
+    width: inherit;
+}
+
+.answer {
+    width:50%;
+    display: block;
+    margin: auto;
+    text-align: center;
+    border: 3px grey dashed;
+    border-radius: 2em;
+    padding-bottom: 1em;
+    padding-top: 1em;
+    margin-top: 1em;
+}
