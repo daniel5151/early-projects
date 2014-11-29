@@ -13,12 +13,6 @@ $(document).ready(function(){
 				if (cell==1) {
 					ctx.fillStyle='#000';
 					ctx.fillRect(cursor[0],cursor[1],1,1); // Pixel
-					//d[0]   = 255;
-					//d[1]   = 255;
-					//d[2]   = 255;
-					//d[3]   = 255;
-					
-					//ctx.putImageData( id, cursor[0],cursor[1] );
 				}
 				cursor[0]+=1;
 			});
@@ -96,7 +90,7 @@ $(document).ready(function(){
 
 			// Writing the footnote text
 			ctx.font = fontsize.toString()+"px courier";
-			ctx.fillText("Rule: " + baseRule + " Rows: " + baseRows,1,baseRows+fontsize+1);
+			ctx.fillText("Rule: " + baseRule + " Rows: " + baseRows,1,baseRows+fontsize-1);
 
 			//Add white on right border
 			ctx.fillStyle = "#fff";
@@ -127,15 +121,12 @@ $(document).ready(function(){
 			alert('Invalid Input');
 		} else {
 			if (!$('#mainCanvas').length) {
-				$('body').append('<img id="canvasImg"> <canvas id="mainCanvas" height="' + (rows+(1+fontsize+1)) + 'px" width="' + (2*rows+5) + 'px"></canvas>');
+				$('body').append('<img id="canvasImg"> <canvas id="mainCanvas" height="' + (rows+(fontsize)) + 'px" width="' + (2*rows+5) + 'px"></canvas>');
 				var c = document.getElementById("mainCanvas");
 				var ctx = c.getContext("2d");
 				var w = c.width;
 				var h = c.height;
 				var cursor = [1,1];
-				
-				//var id = ctx.createImageData(1,1);
-				//var d  = id.data;
 			}
 			drawAutoma(rule, rows);
 		}
