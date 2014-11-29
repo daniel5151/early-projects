@@ -1,0 +1,109 @@
+/*Intro stuff*/
+
+body {
+    font-family:Myriad Pro, sans-serif;
+    color:#505050;
+}
+
+p {
+	text-indent:1em;
+	margin-top:0;
+}
+
+#intro {
+	background-color:#daf4ff;
+	border-radius:2em;
+	min-width:36em;
+	max-width:65em;
+	margin:auto;
+	margin-bottom:1em;
+}
+
+.column {
+	width:49.7%;
+	display:inline-block;
+	vertical-align:top;
+	padding-bottom:1em;
+	padding-top:1em;
+}
+
+#introText {
+	padding-left:1em;
+}
+
+#example {
+	width:100%;
+}
+
+/*Paramaters*/
+
+.number {
+    width:3em;
+	float:right;
+}
+
+form {
+	width:10em;
+	padding-bottom:1em;
+	margin:auto;
+	background-color:#7dd8ff;
+	border-radius:1em;
+	padding:1em 1em 1em 1em;
+	margin-bottom:1em;
+}
+
+#formTitle {
+	text-align:center;
+	padding-bottom:1em;
+}
+
+form span {
+	float:left;
+	width:inherit;
+	color:black;
+}
+
+#submit {
+	margin:auto;
+	display:block;
+}
+
+/*Actual Image*/
+
+#mainCanvas {
+	display:none;
+}
+
+#canvasImg {
+	max-width:99%;
+	padding:0;
+    margin:auto;
+    display: block;
+	padding:5px;
+	border:1px black dashed;
+	border-radius:10px;
+}
+
+/*Misc*/
+
+.black {
+	color:black;
+}
+
+a {
+	text-decoration:none;
+	color:darkblue;
+}
+
+img {
+    image-rendering: optimizeSpeed;             /*                     */
+    image-rendering: -moz-crisp-edges;          /* Firefox             */
+    image-rendering: -o-crisp-edges;            /* Opera               */
+    image-rendering: -webkit-optimize-contrast; /* Chrome (and Safari) */
+    image-rendering: optimize-contrast;         /* CSS3 Proposed       */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE8+                */
+}
+
+* {
+
+}
