@@ -1,0 +1,37 @@
+#info {
+	padding-top: 1em;
+	text-align:center;
+}
+
+#contact {
+	padding-top: 1em;
+	text-align:center;
+}
+
+html {
+	background: rgb(176,212,227);
+	font-family:'Myriad Pro', sans-serif;
+}
+
+#info a {
+	text-decoration:none;
+	color:#000000;
+}
+
+.button {
+	background-color:#ededed;
+	
+	border-radius:2px;
+	border:1px solid #dcdcdc;
+	
+	padding:0.5em;
+	color:#000000;
+	
+	max-width: 20em;
+	margin: 0 auto;
+}.button:hover {
+	background-color:#dfdfdf;
+}.button:active {
+	position:relative;
+	top:1px;
+}
