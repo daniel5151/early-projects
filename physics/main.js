@@ -135,7 +135,7 @@ var draw = {
 		canvas.ctx.stroke();
 
 		canvas.ctx.lineWidth=2;
-		canvas.ctx.strokeStyle=getColorByVelocity();
+		canvas.ctx.strokeStyle=getColorByVelocity(dx,dy);
 		canvas.ctx.stroke();
 
 		draw.circle(x+dx, y+dy, 5, 'black');
@@ -366,7 +366,7 @@ var shapes = {
             }
 
 			// Velocity Lines
-			if (this.showVelocityLines) { draw.velocityLine(x,y,dx,dy); }
+			if (this.showVelocityLines) { draw.velocityLine(this.x,this.y,this.dx,this.dy); }
 		};
 	}
 };
@@ -715,16 +715,16 @@ var input = {
 					};
 				}
 			}
-
-			if (canvas.c.offsetParent) {
+			var obj = canvas.c;
+			if (obj.offsetParent) {
 				// Every time we find a new object, we add its offsetLeft and offsetTop to curleft and curtop.
 				do {
-					input.Cursor.x -= canvas.c.offsetLeft;
-					input.Cursor.y -= canvas.c.offsetTop;
+					input.Cursor.x -= obj.offsetLeft;
+					input.Cursor.y -= obj.offsetTop;
 				}
 				// The while loop can be "while (obj = obj.offsetParent)" only, which does return null
 				// when null is passed back, but that creates a warning in some editors (i.e. VS2010).
-				while ((canvas.c = canvas.c.offsetParent) != null);
+				while ((obj = obj.offsetParent) != null);
 			}
 		}
 	},
