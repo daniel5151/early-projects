@@ -328,22 +328,6 @@ var shapes = {
 		this.colorByVelocity=uVars.colorByVelocity;
         this.showVelocityLines=uVars.showVelocityLines;
 
-		this.drawVelocityLine=function () {
-			canvas.ctx.beginPath();
-			canvas.ctx.moveTo(this.x, this.y);
-			canvas.ctx.lineTo(this.x+this.dx, this.y+this.dy);
-			
-			canvas.ctx.lineWidth=4;
-			canvas.ctx.strokeStyle='black';
-			canvas.ctx.stroke();
-
-			canvas.ctx.lineWidth=2;
-			canvas.ctx.strokeStyle=this.getColorByVelocity();
-			canvas.ctx.stroke();
-
-			draw.circle(this.x+this.dx, this.y+this.dy, 5, 'black');
-		};
-
 		this.draw=function () {
 			// self update
 			this.smiley=uVars.smiley;
