@@ -63,9 +63,9 @@ window.onload = function(){
 	draw.clear();
 
     // Begin
-	console.log('newTest');
-	objects['0'] = new shapes.Circle({color:uVars.shapeColor, x:100, y:100, r:uVars.radius, dx:10, dy:5, id:0});
-	
+	console.log('Running...');
+	setTimeout(function(){objects[0] = new shapes.Circle({color:uVars.shapeColor, x:100, y:100, r:uVars.radius, dx:10, dy:5, id:0})},10);
+	console.log(objects)
 	main();
 };
 
