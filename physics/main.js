@@ -33,7 +33,7 @@ var uVars = {
 };
 
 // Declare global canvas
-var canvas={};
+var canvas;
 
 // Create Main Canvas
 var canvasConstructor = function () {
@@ -109,36 +109,49 @@ var draw = {
     },
 
     // Specialized Drawing Functions
-    circle:function (x,y,r,color) {
-        var ctx=canvas.ctx;
-        ctx.beginPath();
-        ctx.lineWidth=1;
-        ctx.arc(x, y, r, 0, Math.PI * 2, false);
-        ctx.closePath();
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle='black';
-        ctx.stroke();
+    circle:function (x,y,r,color, selected) {
+        canvas.ctx.beginPath();
+        canvas.ctx.lineWidth=selected?3:1;
+        canvas.ctx.arc(x, y, r, 0, Math.PI * 2, false);
+        canvas.ctx.closePath();
+        canvas.ctx.fillStyle = color;
+        canvas.ctx.fill();
+        canvas.ctx.strokeStyle='black';
+        canvas.ctx.stroke();
     },
     writeMessage:function (message, x, y) {
 		var ctx = canvas.ctx;
-        ctx.font = '18pt Calibri';
-		ctx.fillStyle = 'black';
-		ctx.fillText(message, x, y);
+        canvas.ctx.font = '18pt Calibri';
+		canvas.ctx.fillStyle = 'black';
+		canvas.ctx.fillText(message, x, y);
+	},
+	velocityLine:function (x, y, dx, dy) {
+		canvas.ctx.beginPath();
+		canvas.ctx.moveTo(x, y);
+		canvas.ctx.lineTo(x+dx, y+dy);
+		
+		canvas.ctx.lineWidth=4;
+		canvas.ctx.strokeStyle='black';
+		canvas.ctx.stroke();
+
+		canvas.ctx.lineWidth=2;
+		canvas.ctx.strokeStyle=getColorByVelocity();
+		canvas.ctx.stroke();
+
+		draw.circle(x+dx, y+dy, 5, 'black');
 	},
 
     // Common Drawing Functions
     clear:function () {
 		canvas.resize();
-		var ctx = canvas.ctx;
-		// ctx.beginPath();
-		// ctx.rect(0, 0, canvas.w, canvas.h);
+		canvas.ctx.beginPath();
+		canvas.ctx.rect(0, 0, canvas.w, canvas.h);
 
-		// ctx.fillStyle=draw.backgroundGrd();
-		// ctx.fill();
-		// ctx.lineWidth = 1;
-		// ctx.strokeStyle = '#000000';
-		// ctx.stroke();
+		canvas.ctx.fillStyle=draw.backgroundGrd();
+		canvas.ctx.fill();
+		canvas.ctx.lineWidth = 1;
+		canvas.ctx.strokeStyle = '#000000';
+		canvas.ctx.stroke();
 	},
     all:function () {
 		/* Trippy */
@@ -232,10 +245,6 @@ function circlePhys (obj,dt) {
     // Gravity
     obj.dx+=uVars.gravity.dx*dt;
     obj.dy+=uVars.gravity.dy*dt;
-	
-    // Store Coordinates
-    obj.prevCords.push([obj.x, obj.y]);
-    obj.prevCords.shift();
 }
 
 // Paused
@@ -258,72 +267,72 @@ function mainPhysLoop (dt) {
     }
 }
 
+getColorByHeight=function (y) {
+	/* Color by Height */
+	var heightColoring;
+	var tempDistance;
+	if (y>2*canvas.h/3) {
+		heightColoring='rgb(255,0,0)';
+	} else if (y>canvas.h/3) {
+		tempDistance=Math.floor(y*255/(canvas.h/3));
+		heightColoring='rgb(255,'+(255-(tempDistance % 255))+',0)';
+	} else {
+		tempDistance=Math.floor(y*255/(canvas.h/3));
+		heightColoring='rgb('+tempDistance+',255,0)';
+	}
+	return heightColoring;
+};
+getColorByVelocity=function (dx, dy) {
+	/* Color by Height */
+	var velocityColoring;
+	var tempVelocity=Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
+	if (tempVelocity>200) {
+		velocityColoring='rgb(255,0,0)';
+	} else if (tempVelocity>100) {
+		tempVelocity=Math.floor(tempVelocity*255/(100));
+		velocityColoring='rgb(255,'+(255-(tempVelocity % 255))+',0)';
+	} else {
+		tempVelocity=Math.floor(tempVelocity*255/(100));
+		velocityColoring='rgb('+tempVelocity+',255,0)';
+	}
+	return velocityColoring;
+};
+
 // Shape Constructors
 var shapes = {
     Circle:function (props) {
 		// defaults
         this.type='circle';
-		this.color='grey';
+		this.color=getRandomColor();
+		this.id=0;
+		
 		this.x=100;
 		this.y=100;
 		this.r=25;
 		this.dx=0;
 		this.dy=0;
-		this.friction=0.5;
-		this.prevCords=[[0,0],[1,1],[2,2]];
-		this.id=0;
+		this.density = 1; // 1 mass unit per pixelDepth by default
+		this.mass = Math.PI*Math.pow(this.r, 2)*this.density;
+		
 		this.selected=false;
 		this.suspendPhysics=false;
-
+		
+		
         // customs
         for (var prop in props) {
             this[prop]=props[prop];
         }
-		
-		this.density = 1; // 1 mass unit per pixelDepth
-		this.mass = Math.PI*Math.pow(this.r, 2)*this.density;
 		
         this.smiley=uVars.smiley;
         this.colorByHeight=uVars.colorByHeight;
 		this.colorByVelocity=uVars.colorByVelocity;
         this.showVelocityLines=uVars.showVelocityLines;
 
-		this.getColorByHeight=function () {
-			/* Color by Height */
-			var heightColoring;
-			var tempDistance;
-			if (this.y>2*canvas.h/3) {
-				heightColoring='rgb(255,0,0)';
-			} else if (this.y>canvas.h/3) {
-				tempDistance=Math.floor(this.y*255/(canvas.h/3));
-				heightColoring='rgb(255,'+(255-(tempDistance % 255))+',0)';
-			} else {
-				tempDistance=Math.floor(this.y*255/(canvas.h/3));
-				heightColoring='rgb('+tempDistance+',255,0)';
-			}
-			return heightColoring;
-		};
-		this.getColorByVelocity=function () {
-			/* Color by Height */
-			var velocityColoring;
-			var tempVelocity=Math.sqrt(Math.pow(this.dx, 2)+Math.pow(this.dy, 2));
-			if (tempVelocity>200) {
-				velocityColoring='rgb(255,0,0)';
-			} else if (tempVelocity>100) {
-				tempVelocity=Math.floor(tempVelocity*255/(100));
-				velocityColoring='rgb(255,'+(255-(tempVelocity % 255))+',0)';
-			} else {
-				tempVelocity=Math.floor(tempVelocity*255/(100));
-				velocityColoring='rgb('+tempVelocity+',255,0)';
-			}
-			return velocityColoring;
-		};
-
 		this.drawVelocityLine=function () {
 			canvas.ctx.beginPath();
 			canvas.ctx.moveTo(this.x, this.y);
 			canvas.ctx.lineTo(this.x+this.dx, this.y+this.dy);
-
+			
 			canvas.ctx.lineWidth=4;
 			canvas.ctx.strokeStyle='black';
 			canvas.ctx.stroke();
@@ -342,21 +351,14 @@ var shapes = {
 			this.colorByVelocity=uVars.colorByVelocity;
 			this.showVelocityLines=uVars.showVelocityLines;
 			this.colorByRainbow=uVars.colorByRainbow;
-
-			// Draw Circle
-            canvas.ctx.beginPath();
-			canvas.ctx.strokeStyle = '#000000';
-            canvas.ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
-			canvas.ctx.closePath();
-
-			if (this.colorByHeight) { canvas.ctx.fillStyle = this.getColorByHeight(); }
-			else if (this.colorByVelocity) { canvas.ctx.fillStyle = this.getColorByVelocity(); }
-			else if (this.colorByRainbow) { canvas.ctx.fillStyle = getRandomColor(); }
-			else { canvas.ctx.fillStyle = this.color; }
-
-			canvas.ctx.fill();
-			canvas.ctx.lineWidth = (this.selected) ? 3 : 1;
-			canvas.ctx.stroke();
+			
+			var fillcolor;
+			if (this.colorByHeight) { fillcolor = getColorByHeight(this.y); }
+			else if (this.colorByVelocity) { fillcolor = getColorByVelocity(this.dx, this.dy); }
+			else if (this.colorByRainbow) { fillcolor = getRandomColor(); }
+			else { fillcolor = this.color; }
+			
+			draw.circle(this.x,this.y, this.r, fillcolor, this.selected);
 
 			// Draw Smiley if Need Be
             if (this.smiley) {
@@ -380,21 +382,17 @@ var shapes = {
             }
 
 			// Velocity Lines
-			if (this.showVelocityLines) { this.drawVelocityLine(); }
+			if (this.showVelocityLines) { draw.velocityLine(x,y,dx,dy); }
 		};
-
-		this.checkClick=function () {
-            canvas.ctx.beginPath();
-			canvas.ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
-			canvas.ctx.closePath();
-			return (canvas.ctx.isPointInPath(input.Cursor.x, input.Cursor.y)) ? true : false;
-		};
-
-        this.returnCords=function () {
-            return [this.x, this.y];
-        };
 	}
 };
+
+function checkClick(obj) {
+	canvas.ctx.beginPath();
+	canvas.ctx.arc(obj.x, obj.y, obj.r, 0, Math.PI * 2, false);
+	canvas.ctx.closePath();
+	return (canvas.ctx.isPointInPath(input.Cursor.x, input.Cursor.y)) ? true : false;
+}
 
 // Vars and Subs to do with the side panels
 var panels = {
@@ -500,10 +498,10 @@ var auxTools = {
     drag:function (obj) {
         auxTools.offCentrePos={x:input.Cursor.x-obj.x, y:input.Cursor.y-obj.y};
         handles.toolHandle = setInterval (function() {
-            /* Proccessing */
+            /* Processing */
             this.finalPos = [input.Cursor.x-auxTools.offCentrePos.x, input.Cursor.y-auxTools.offCentrePos.y];
-            obj.dx=(this.finalPos[0]-obj.returnCords()[0])/3;
-            obj.dy=(this.finalPos[1]-obj.returnCords()[1])/3;
+            obj.dx=(this.finalPos[0]-obj.x)/3;
+            obj.dy=(this.finalPos[1]-obj.y)/3;
 
             /* Drawing */
             draw.extraDraw.drag = function () {
@@ -717,19 +715,32 @@ var input = {
 				x:event.clientX - rect.left,
 				y:Math.floor(event.clientY - rect.top)
 			};
-		} else if (type == 'touchmove') {
-			if (event.touches.length == 1) {
-				input.Cursor = {
-					x:event.targetTouches[0].pageX,
-					y:event.targetTouches[0].pageY
-				};
+		} else {
+			if (type == 'touchmove') {
+				if (event.touches.length == 1) {
+					input.Cursor = {
+						x:event.targetTouches[0].pageX,
+						y:event.targetTouches[0].pageY
+					};
+				}
+			} else if (type == 'touchstart') {
+				if (event.touches.length == 1) {
+					input.Cursor = {
+						x:event.changedTouches[0].pageX,
+						y:event.changedTouches[0].pageY
+					};
+				}
 			}
-		} else if (type == 'touchstart') {
-			if (event.touches.length == 1) {
-				input.Cursor = {
-					x:event.changedTouches[0].pageX,
-					y:event.changedTouches[0].pageY
-				};
+
+			if (canvas.c.offsetParent) {
+				// Every time we find a new object, we add its offsetLeft and offsetTop to curleft and curtop.
+				do {
+					input.Cursor.x -= canvas.c.offsetLeft;
+					input.Cursor.y -= canvas.c.offsetTop;
+				}
+				// The while loop can be "while (obj = obj.offsetParent)" only, which does return null
+				// when null is passed back, but that creates a warning in some editors (i.e. VS2010).
+				while ((canvas.c = canvas.c.offsetParent) != null);
 			}
 		}
 	},
@@ -926,7 +937,7 @@ function lineDistance( point1, point2 ) {
 // Return what object has been clicked
 function whatObjClick () {
     for (var key in objects) {
-        if (objects[key].checkClick()) { return objects[key]; }
+        if (checkClick(objects[key])) { return objects[key]; }
     }
     return null;
 }
