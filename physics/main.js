@@ -710,7 +710,7 @@ var eventHandlers = {
             input.trackCursor(event, 'mouse');
         },false);
         document.addEventListener( 'touchmove', function (event) { // this  object refers to canvas object
-            if (!panels.inSettings || !panels.inTools) {event.preventDefault();}
+            // if (!panels.inSettings || !panels.inTools) {event.preventDefault();}
             input.trackCursor(event, 'touchmove');
         },false);
 
