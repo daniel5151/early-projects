@@ -6,7 +6,7 @@ var handles = {
 };
 
 // Declare global object container
-var ids = 0;
+var ids = 1;
 var objects = {};
 
 // Variables
@@ -14,7 +14,7 @@ var uVars = {
     debug:false,
     fps:60,
 
-    maxObjects:0,
+    maxObjects:10,
 
     gravity:{
         strength:5,
@@ -298,8 +298,8 @@ function circlePhys (obj,dt) {
     if (obj.x-obj.r < 0) { obj.x=0+obj.r; }
 
     //Bounding Box Constraints and wall friction
-    if (obj.y + obj.dy*dt + obj.r > h || obj.y + obj.dy*dt - obj.r < 0){ obj.dy = -obj.dy*0.75; obj.dx = obj.dx*0.99;}
-    if (obj.x + obj.dx*dt + obj.r > w || obj.x + obj.dx*dt - obj.r < 0){ obj.dx = -obj.dx*0.75; obj.dy = obj.dy*0.99;}
+    if (obj.y + obj.dy*dt + obj.r > h || obj.y + obj.dy*dt - obj.r < 0){ obj.dy = -obj.dy*0.5; obj.dx = obj.dx*0.99;}
+    if (obj.x + obj.dx*dt + obj.r > w || obj.x + obj.dx*dt - obj.r < 0){ obj.dx = -obj.dx*0.5; obj.dy = obj.dy*0.99;}
 
     // Gravity
     obj.dx+=uVars.gravity.dx*dt;
@@ -326,19 +326,52 @@ function mainPhysLoop (dt) {
     }
 }
 
+getColorByHeight=function (y) {
+	/* Color by Height */
+	var heightColoring;
+	var tempDistance;
+	if (y>2*canvas.h/3) {
+		heightColoring='rgb(255,0,0)';
+	} else if (y>canvas.h/3) {
+		tempDistance=Math.floor(y*255/(canvas.h/3));
+		heightColoring='rgb(255,'+(255-(tempDistance % 255))+',0)';
+	} else {
+		tempDistance=Math.floor(y*255/(canvas.h/3));
+		heightColoring='rgb('+tempDistance+',255,0)';
+	}
+	return heightColoring;
+};
+getColorByVelocity=function (dx, dy) {
+	/* Color by Height */
+	var velocityColoring;
+	var tempVelocity=Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
+	if (tempVelocity>200) {
+		velocityColoring='rgb(255,0,0)';
+	} else if (tempVelocity>100) {
+		tempVelocity=Math.floor(tempVelocity*255/(100));
+		velocityColoring='rgb(255,'+(255-(tempVelocity % 255))+',0)';
+	} else {
+		tempVelocity=Math.floor(tempVelocity*255/(100));
+		velocityColoring='rgb('+tempVelocity+',255,0)';
+	}
+	return velocityColoring;
+};
+
 // Shape Constructors
 var shapes = {
     Circle:function (props) {
 		// defaults
         this.type='circle';
 		this.color=getRandomColor();
-		this.id=ids;
+		this.id=0;
+		
 		this.x=100;
 		this.y=100;
 		this.r=25;
 		this.dx=0;
 		this.dy=0;
 		this.density = 1; // 1 mass unit per pixelDepth by default
+		this.mass = Math.PI*Math.pow(this.r, 2)*this.density;
 		
 		this.selected=false;
 		this.suspendPhysics=false;
@@ -349,25 +382,10 @@ var shapes = {
             this[prop]=props[prop];
         }
 		
-		this.mass = Math.PI*Math.pow(this.r, 2)*this.density;
-		
         this.smiley=uVars.smiley;
         this.colorByHeight=uVars.colorByHeight;
 		this.colorByVelocity=uVars.colorByVelocity;
         this.showVelocityLines=uVars.showVelocityLines;
-	},
-	Line:function (props) {
-		//defaults
-        this.type='line';
-		this.color=getRandomColor();
-		this.id=0;
-		this.x=100;
-		this.y=100;
-		this.r=25;
-		this.dx=0;
-		this.dy=0;
-		this.density = 1; // 1 mass unit per pixelDepth by default
-		this.mass = Math.PI*Math.pow(this.r, 2)*this.density;
 	}
 };
 
@@ -377,6 +395,40 @@ function checkClick(obj) {
 	canvas.ctx.closePath();
 	return (canvas.ctx.isPointInPath(input.Cursor.x, input.Cursor.y)) ? true : false;
 }
+
+// Vars and Subs to do with the side panels
+var panels = {
+    inSettings:false,
+    inTools:false,
+    getDivPositions:function () {
+        if (!this.hasOwnProperty('noPushPos')) {
+            this.noPushPos=[$('form').position().left,
+                            $('#mainCanvas').position().left,
+                            $('#toolbar').position().left];
+        }
+        return [$('form').position().left,
+                $('#mainCanvas').position().left,
+                $('#toolbar').position().left];
+    },
+    initColorPicker:function () {
+        $("#colorPicker").spectrum({
+            clickoutFiresChange: true,
+            preferredFormat: "hex",
+            showInput: true
+        });
+    },
+    initToolButtons:function () {
+        for (var tool in tools) {
+            $('#toolbar').append('<a href="#"><div id='+tools[tool].name+' class=\'toolButton\'>'+tools[tool].description+'</div></a><br>');
+        }
+    },
+    pushPushables:function (em) {
+        if (panels.inTools && Math.abs(em)==17) {em+=7; panels.inTools=false;}
+        else if (panels.inSettings && Math.abs(em)==7) {em+=17; panels.inSettings=false;}
+        $('.pushLeft').animate({left:"+=" + em + "em"},500);
+		$('.pushRight').animate({right:"-=" + em + "em"},500);
+    },
+};
 
 // Tools and Axillary tool Functions
 var auxTools = {
@@ -467,16 +519,6 @@ var auxTools = {
         },1);
     }
 };
-
-function getNewId() {
-	if (ids==uVars.maxObjects) {
-		ids=0;
-	} else {
-		ids+=1;
-	}
-	return ids;
-}
-
 var tools={
     /////////////////////////////////////////////////////
     tool_spawn:{
@@ -484,8 +526,9 @@ var tools={
         description:'Spawn',
         onStart:function () {
             handles.toolHandle = setInterval (function () {
-				getNewId()
-                objects[ids] = new shapes.Circle({color:uVars.shapeColor, x:input.Cursor.x, y:input.Cursor.y, r:uVars.radius});
+                if (ids==uVars.maxObjects) { ids=0; }
+                objects[ids] = new shapes.Circle({color:uVars.shapeColor, x:input.Cursor.x, y:input.Cursor.y, r:uVars.radius, id:ids});
+                ids+=1;
             }, 50);
         },
         onEnd:function () {
@@ -499,8 +542,8 @@ var tools={
         description:'Spawn + Slingshot',
         onStart:function () {
             if (handles.toolHandle === null) { // Throw only once
-                getNewId()
-                objects[ids] = new shapes.Circle({color:uVars.shapeColor, x:input.Cursor.x, y:input.Cursor.y, r:uVars.radius});
+                if (ids==uVars.maxObjects) { ids=0; }
+                objects[ids] = new shapes.Circle({color:uVars.shapeColor, x:input.Cursor.x, y:input.Cursor.y, r:uVars.radius, id:ids});
                 objects[ids].selected=true;
                 auxTools.throwBegin(objects[ids], false);
             }
@@ -509,7 +552,8 @@ var tools={
             if (handles.toolHandle !== null) { // Not to throw again
                 auxTools.throwEnd(objects[ids], false);
                 objects[ids].selected=false;
-				
+
+                ids+=1;
                 clearInterval(handles.toolHandle);
                 handles.toolHandle = null;
             }
@@ -608,8 +652,9 @@ var tools={
         onStart:function (selectedObj) {
             if (selectedObj!==null) {
                 for (var i=2; i<randInt(7,3); i++) {
-					getNewId()
-					objects[ids] = new shapes.Circle({color:selectedObj.color, x:selectedObj.x, y:selectedObj.y, r:randInt(selectedObj.r, 5), dx:randInt(50,-50), dy:randInt(50,-50)});
+					if (ids==uVars.maxObjects) { ids=0; }
+					objects[ids] = new shapes.Circle({color:selectedObj.color, x:selectedObj.x, y:selectedObj.y, r:randInt(selectedObj.r, 5), id:ids, dx:randInt(50,-50), dy:randInt(50,-50)});
+					ids+=1;
 
 					objects[selectedObj.id] = new shapes.Circle({color:selectedObj.color, x:selectedObj.x-selectedObj.r/2, y:selectedObj.y, r:selectedObj.r/2, id:selectedObj.id, dx:-10});
 				}
@@ -626,15 +671,17 @@ var tools={
         onStart:function (selectedObj) {
             if (selectedObj!==null && handles.toolHandle === null) {
                 selectedObj.selected=true;
-				handles.toolHandle = setInterval (function () {
-					draw.extraDraw.info=function () {
-						var line=0;
-						for (var prop in selectedObj) {
-							draw.writeMessage(prop + ': ' + selectedObj[prop], input.Cursor.x+10, input.Cursor.y+line);
-							line+=18;
-						}
-					};
-				}, 1000/uVars.fps);
+               handles.toolHandle = setInterval (function () {
+                   draw.extraDraw.info=function () {
+                       var line=0;
+                       for (var prop in selectedObj) {
+                           if (typeof(selectedObj[prop]) != 'function') {
+                               draw.writeMessage(prop + ': ' + selectedObj[prop], input.Cursor.x+10, input.Cursor.y+line);
+                               line+=18;
+                           }
+                       }
+                   };
+               }, 1000/uVars.fps);
             }
         },
         onEnd:function (selectedObj) {
@@ -932,34 +979,3 @@ function lineDistance( point1, point2 ) {
 function randInt (max, min) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
-getColorByHeight=function (y) {
-	/* Color by Height */
-	var heightColoring;
-	var tempDistance;
-	if (y>2*canvas.h/3) {
-		heightColoring='rgb(255,0,0)';
-	} else if (y>canvas.h/3) {
-		tempDistance=Math.floor(y*255/(canvas.h/3));
-		heightColoring='rgb(255,'+(255-(tempDistance % 255))+',0)';
-	} else {
-		tempDistance=Math.floor(y*255/(canvas.h/3));
-		heightColoring='rgb('+tempDistance+',255,0)';
-	}
-	return heightColoring;
-};
-getColorByVelocity=function (dx, dy) {
-	/* Color by Height */
-	var velocityColoring;
-	var tempVelocity=Math.sqrt(Math.pow(dx, 2)+Math.pow(dy, 2));
-	if (tempVelocity>200) {
-		velocityColoring='rgb(255,0,0)';
-	} else if (tempVelocity>100) {
-		tempVelocity=Math.floor(tempVelocity*255/(100));
-		velocityColoring='rgb(255,'+(255-(tempVelocity % 255))+',0)';
-	} else {
-		tempVelocity=Math.floor(tempVelocity*255/(100));
-		velocityColoring='rgb('+tempVelocity+',255,0)';
-	}
-	return velocityColoring;
-};
