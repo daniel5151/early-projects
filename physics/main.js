@@ -22,7 +22,6 @@ var uVars = {
         dx:0,
         dy:5,
     },
-    simSpeed:1,
 
     radius:25,
     shapeColor:getRandomColor(),
@@ -65,7 +64,6 @@ window.onload = function(){
     // Begin
 	console.log('Running...');
 	setTimeout(function(){objects[0] = new shapes.Circle({color:uVars.shapeColor, x:100, y:100, r:uVars.radius, dx:10, dy:5, id:0})},10);
-	console.log(objects)
 	main();
 };
 
@@ -140,7 +138,52 @@ var draw = {
 
 		draw.circle(x+dx, y+dy, 5, 'black');
 	},
+	
+	// Shapes
+	shape:{
+		circle:function(obj){
+			// self update
+			
+			// obj.smiley=uVars.smiley;
+			// obj.colorByHeight=uVars.colorByHeight;
+			// obj.colorByVelocity=uVars.colorByVelocity;
+			// obj.colorByRainbow=uVars.colorByRainbow;
+			obj.showVelocityLines=uVars.showVelocityLines;
+			
+			var fillcolor;
+			if (obj.colorByHeight) { fillcolor = getColorByHeight(obj.y); }
+			else if (obj.colorByVelocity) { fillcolor = getColorByVelocity(obj.dx, obj.dy); }
+			else if (obj.colorByRainbow) { fillcolor = getRandomColor(); }
+			else { fillcolor = obj.color; }
+			
+			draw.circle(obj.x,obj.y, obj.r, fillcolor, obj.selected);
 
+			// Draw Smiley if Need Be
+			if (obj.smiley) {
+				// Smile
+				canvas.ctx.strokeStyle = '#000000';
+				canvas.ctx.lineWidth = 1;
+				canvas.ctx.beginPath();
+				canvas.ctx.arc(obj.x,obj.y-obj.r/8,obj.r*0.75,0.2*Math.PI,0.8*Math.PI,false);
+				canvas.ctx.closePath();
+				canvas.ctx.stroke();
+				canvas.ctx.fillStyle = 'white';
+				canvas.ctx.fill();
+
+				// Left Eye
+				draw.circle(obj.x-obj.r/2,obj.y-obj.r/4,obj.r/8,'white');
+				draw.circle(obj.x-obj.r/2,obj.y-obj.r/4,obj.r/8/3,'black');
+
+				// Right Eye
+				draw.circle(obj.x+obj.r/2,obj.y-obj.r/4,obj.r/8,'white');
+				draw.circle(obj.x+obj.r/2,obj.y-obj.r/4,obj.r/8/3,'black');
+			}
+
+			// Velocity Lines
+			if (obj.showVelocityLines) { draw.velocityLine(obj.x,obj.y,obj.dx,obj.dy); }
+		}
+	},
+	
     // Common Drawing Functions
     clear:function () {
 		canvas.resize();
@@ -166,7 +209,7 @@ var draw = {
 
 		/* Draw All */
 		for (var c = keys.length, n = 0; n < c; n++) {
-			objects[keys[n]].draw();
+			draw.shape.circle(objects[keys[n]]);
 		}
 
 		/* Execute any extra drawing functions */
@@ -189,47 +232,63 @@ function circlePhys (obj,dt) {
     var h = canvas.h;
     var w = canvas.w;
 	
-	dt = dt/75*uVars.simSpeed
+	dt = dt/75;
 	
     //Apply Motion
     obj.x+=obj.dx*dt;
     obj.y+=obj.dy*dt;
 
 	// Collision
-	if (true) {
-	for (var i in objects) {
-		var distX = objects[i].x - obj.x;
-		var distY = objects[i].y - obj.y;
-		var dist = Math.sqrt(distX*distX + distY*distY);
-		var minDist = objects[i].r + obj.r;
-		if (dist < minDist) {
-			var dx1i=obj.dx
-			var dy1i=obj.dy
-			
-			var angle = Math.atan2(distY, distX);
-			var targetX = obj.x + Math.cos(angle) * minDist;
-			var targetY = obj.y + Math.sin(angle) * minDist;
-			var ax = (targetX - objects[i].x);
-			var ay = (targetY - objects[i].y);
-			
-			// These are actual textbook physics equations.
-			// obj.dx = (((obj.mass-objects[i].mass)/(obj.mass+objects[i].mass))*obj.dx+(2*objects[i].mass/(obj.mass+objects[i].mass))*objects[i].dx);
-			// obj.dy = (((obj.mass-objects[i].mass)/(obj.mass+objects[i].mass))*obj.dy+(2*objects[i].mass/(obj.mass+objects[i].mass))*objects[i].dy);
-			// objects[i].dx = (((objects[i].mass-obj.mass)/(objects[i].mass+obj.mass))*objects[i].dx+(2*obj.mass/(objects[i].mass+obj.mass))*dx1i);
-			// objects[i].dy = (((objects[i].mass-obj.mass)/(objects[i].mass+obj.mass))*objects[i].dy+(2*obj.mass/(objects[i].mass+obj.mass))*dy1i);
-			
-			// These are quasiphysics.
-			obj.dx -= ax;
-			obj.dy -= ay;
-			objects[i].dx += ax;
-			objects[i].dy += ay;
-			
-			obj.x -= ax;
-			obj.y -= ay;
-			objects[i].x += ax;
-			objects[i].y += ay;
+	if (Object.keys(objects).length>1) {
+		for (var i in objects) {
+			if (objects[i].id==obj.id) { continue; }
+			var distX = objects[i].x - obj.x;
+			var distY = objects[i].y - obj.y;
+			var dist = Math.sqrt(distX*distX + distY*distY);
+			var minDist = objects[i].r + obj.r;
+			if (dist < minDist) {
+				var aCol = Math.atan2(distY, distX);
+				
+				var v1 = Math.sqrt(Math.pow(obj.dx,2)+Math.pow(obj.dy,2));
+				var v2 = Math.sqrt(Math.pow(objects[i].dx,2)+Math.pow(objects[i].dy,2));
+				
+				var vAngle1=Math.atan2(obj.dy, obj.dx);
+				var vAngle2=Math.atan2(objects[i].dy, objects[i].dx);
+				
+				var m1 = obj.mass;
+				var m2 = objects[i].mass;
+				
+				// These are actual textbook physics equations for perfectly elastic collision.
+				// For explanation, visit http://williamecraver.wix.com/elastic-equations
+				obj.dx = (v1*Math.cos(vAngle1-aCol)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-aCol))/(m1+m2)*Math.cos(aCol)+v1*Math.sin(vAngle1-aCol)*Math.cos(aCol+Math.PI/2);
+				obj.dy = (v1*Math.cos(vAngle1-aCol)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-aCol))/(m1+m2)*Math.sin(aCol)+v1*Math.sin(vAngle1-aCol)*Math.sin(aCol+Math.PI/2);
+				objects[i].dx = (v2*Math.cos(vAngle2-aCol)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-aCol))/(m1+m2)*Math.cos(aCol)+v2*Math.sin(vAngle2-aCol)*Math.cos(aCol+Math.PI/2);
+				objects[i].dy = (v2*Math.cos(vAngle2-aCol)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-aCol))/(m1+m2)*Math.sin(aCol)+v2*Math.sin(vAngle2-aCol)*Math.sin(aCol+Math.PI/2);
+				
+				// These are quasiphysics.
+				// obj.dx -= ax;
+				// obj.dy -= ay;
+				// objects[i].dx += ax;
+				// objects[i].dy += ay;
+				
+				// Prevents nastiness.
+				var targetX = obj.x + Math.cos(aCol) * minDist;
+				var targetY = obj.y + Math.sin(aCol) * minDist;
+				var ax = (targetX - objects[i].x);
+				var ay = (targetY - objects[i].y);
+				
+				obj.x -= ax*0.9;
+				obj.y -= ay*0.9;
+				objects[i].x += ax*0.9;
+				objects[i].y += ay*0.9;
+				
+				// add a bit of "padding" to the collision, thereby making it not perfectly elastic
+				obj.dx *= 0.9;
+				obj.dy *= 0.9;
+				objects[i].dx *= 0.9;
+				objects[i].dy *= 0.9;
+			}
 		}
-    }
 	}
 	
     //Check if Out of Bounds
@@ -255,7 +314,7 @@ function pause () {
 
 function mainPhysLoop (dt) {
     if (!paused) {
-        for (var key in objects) {
+		for (var key in objects) {
             if (objects[key].suspendPhysics!==true) {
                 circlePhys(objects[key],dt);
             }
@@ -327,47 +386,6 @@ var shapes = {
         this.colorByHeight=uVars.colorByHeight;
 		this.colorByVelocity=uVars.colorByVelocity;
         this.showVelocityLines=uVars.showVelocityLines;
-
-		this.draw=function () {
-			// self update
-			this.smiley=uVars.smiley;
-			this.colorByHeight=uVars.colorByHeight;
-			this.colorByVelocity=uVars.colorByVelocity;
-			this.showVelocityLines=uVars.showVelocityLines;
-			this.colorByRainbow=uVars.colorByRainbow;
-			
-			var fillcolor;
-			if (this.colorByHeight) { fillcolor = getColorByHeight(this.y); }
-			else if (this.colorByVelocity) { fillcolor = getColorByVelocity(this.dx, this.dy); }
-			else if (this.colorByRainbow) { fillcolor = getRandomColor(); }
-			else { fillcolor = this.color; }
-			
-			draw.circle(this.x,this.y, this.r, fillcolor, this.selected);
-
-			// Draw Smiley if Need Be
-            if (this.smiley) {
-                // Smile
-                canvas.ctx.strokeStyle = '#000000';
-                canvas.ctx.lineWidth = 1;
-                canvas.ctx.beginPath();
-                canvas.ctx.arc(this.x,this.y-this.r/8,this.r*0.75,0.2*Math.PI,0.8*Math.PI,false);
-                canvas.ctx.closePath();
-                canvas.ctx.stroke();
-                canvas.ctx.fillStyle = 'white';
-                canvas.ctx.fill();
-
-                // Left Eye
-                draw.circle(this.x-this.r/2,this.y-this.r/4,this.r/8,'white');
-                draw.circle(this.x-this.r/2,this.y-this.r/4,this.r/8/3,'black');
-
-                // Right Eye
-                draw.circle(this.x+this.r/2,this.y-this.r/4,this.r/8,'white');
-                draw.circle(this.x+this.r/2,this.y-this.r/4,this.r/8/3,'black');
-            }
-
-			// Velocity Lines
-			if (this.showVelocityLines) { draw.velocityLine(this.x,this.y,this.dx,this.dy); }
-		};
 	}
 };
 
@@ -814,8 +832,6 @@ function updateVars () {
     uVars.radius = (randomRadius)?Math.floor(Math.random() * (50 - 5) + 5):parseInt($( "#radiusSlide" ).val(),10);
 
     uVars.debug = ($('#debug').prop('checked')) ? true : false;
-
-    uVars.simSpeed = parseFloat($( "#simSpeedSlide" ).val());
 
     var newMaxObjects = parseInt($( "#maxObjSlide" ).val(),10);
     if (newMaxObjects!=uVars.maxObjects) {
