@@ -277,10 +277,10 @@ function circlePhys (obj,dt) {
 				var ax = (targetX - objects[i].x);
 				var ay = (targetY - objects[i].y);
 				
-				obj.x -= ax*0.9;
-				obj.y -= ay*0.9;
-				objects[i].x += ax*0.9;
-				objects[i].y += ay*0.9;
+				obj.x -= ax;
+				obj.y -= ay;
+				objects[i].x += ax;
+				objects[i].y += ay;
 				
 				// add a bit of "padding" to the collision, thereby making it not perfectly elastic
 				obj.dx *= 0.9;
@@ -298,8 +298,8 @@ function circlePhys (obj,dt) {
     if (obj.x-obj.r < 0) { obj.x=0+obj.r; }
 
     //Bounding Box Constraints and wall friction
-    if (obj.y + obj.dy*dt + obj.r > h || obj.y + obj.dy*dt - obj.r < 0){ obj.dy = -obj.dy*0.5; obj.dx = obj.dx*0.95;}
-    if (obj.x + obj.dx*dt + obj.r > w || obj.x + obj.dx*dt - obj.r < 0){ obj.dx = -obj.dx*0.5; obj.dy = obj.dy*0.95;}
+    if (obj.y + obj.dy*dt + obj.r > h || obj.y + obj.dy*dt - obj.r < 0){ obj.dy = -obj.dy*0.5; obj.dx = obj.dx*0.99;}
+    if (obj.x + obj.dx*dt + obj.r > w || obj.x + obj.dx*dt - obj.r < 0){ obj.dx = -obj.dx*0.5; obj.dy = obj.dy*0.99;}
 
     // Gravity
     obj.dx+=uVars.gravity.dx*dt;
@@ -757,7 +757,7 @@ var eventHandlers = {
             input.trackCursor(event, 'mouse');
         },false);
         document.addEventListener( 'touchmove', function (event) { // this  object refers to canvas object
-            if (!panels.inSettings) {event.preventDefault();}
+            if (!panels.inSettings || !panels.inTools) {event.preventDefault();}
             input.trackCursor(event, 'touchmove');
         },false);
 
@@ -818,7 +818,7 @@ function updateVars () {
     if (draw.dontReDrawCanvas) { input.cursorType='none'; }
     else { input.cursorType='default'; }
 
-    // Coloring
+    // Colouring
     var randomColor = ($('#randomColor').prop('checked')) ? true : false;
     uVars.shapeColor=(randomColor)?getRandomColor():$( "#colorPicker" ).val();
     uVars.colorByHeight = ($('#colorByHeight').prop('checked')) ? true : false;
@@ -905,6 +905,14 @@ var userInteract = {
     }
 };
 
+// Return what object has been clicked
+function whatObjClick () {
+    for (var key in objects) {
+        if (checkClick(objects[key])) { return objects[key]; }
+    }
+    return null;
+}
+
 $(document).keypress(function(event){
     var keycode = (event.keyCode ? event.keyCode : event.which);
     if(keycode == '32'){
@@ -932,14 +940,6 @@ function lineDistance( point1, point2 ) {
   ys = ys * ys;
 
   return Math.sqrt( xs + ys );
-}
-
-// Return what object has been clicked
-function whatObjClick () {
-    for (var key in objects) {
-        if (checkClick(objects[key])) { return objects[key]; }
-    }
-    return null;
 }
 
 function randInt (max, min) {
