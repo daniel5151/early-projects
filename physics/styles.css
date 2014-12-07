@@ -11,7 +11,7 @@ body {
 	cursor: none;
 }
 
-#settingPanel {
+form {
 	background-color:#7dd8ff;
 	width: 15em;
 	padding:1em 1em 1em 1em;

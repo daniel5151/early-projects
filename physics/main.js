@@ -738,11 +738,11 @@ var panels = {
     inTools:false,
     getDivPositions:function () {
         if (!this.hasOwnProperty('noPushPos')) {
-            this.noPushPos=[$('#settingPanel').position().left,
+            this.noPushPos=[$('form').position().left,
                             $('#mainCanvas').position().left,
                             $('#toolbar').position().left];
         }
-        return [$('#settingPanel').position().left,
+        return [$('form').position().left,
                 $('#mainCanvas').position().left,
                 $('#toolbar').position().left];
     },
