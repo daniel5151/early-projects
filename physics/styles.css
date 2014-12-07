@@ -11,11 +11,11 @@ body {
 	cursor: none;
 }
 
-#setting {
+form {
 	background-color:#7dd8ff;
 	width: 15em;
 	padding:1em 1em 1em 1em;
-	overflow-y: scroll;
+	overflow-y: auto;
 	position: absolute;
 	z-index:1;
 	top:0;
@@ -34,7 +34,7 @@ label {
 	background-color:#ffb97d;
 	width: 7em;
 	padding:0.5em 0.5em 0.5em 0.5em;
-	overflow-y: scroll;
+	overflow-y: auto;
 	position: absolute;
 	z-index:1;
 	top:0;

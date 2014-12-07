@@ -710,7 +710,7 @@ var eventHandlers = {
             input.trackCursor(event, 'mouse');
         },false);
         document.addEventListener( 'touchmove', function (event) { // this  object refers to canvas object
-            // if (!panels.inSettings || !panels.inTools) {event.preventDefault();}
+            if (!panels.inSettings || !panels.inTools) {event.preventDefault();}
             input.trackCursor(event, 'touchmove');
         },false);
 
@@ -853,11 +853,11 @@ var panels = {
     inTools:false,
     getDivPositions:function () {
         if (!this.hasOwnProperty('noPushPos')) {
-            this.noPushPos=[$('#setting').position().left,
+            this.noPushPos=[$('form').position().left,
                             $('#mainCanvas').position().left,
                             $('#toolbar').position().left];
         }
-        return [$('#setting').position().left,
+        return [$('form').position().left,
                 $('#mainCanvas').position().left,
                 $('#toolbar').position().left];
     },
