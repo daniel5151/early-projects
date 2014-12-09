@@ -147,7 +147,7 @@ var draw = {
 			// obj.smiley=uVars.smiley;
 			// obj.colorByHeight=uVars.colorByHeight;
 			// obj.colorByVelocity=uVars.colorByVelocity;
-			// obj.colorByRainbow=uVars.colorByRainbow;
+			obj.colorByRainbow=uVars.colorByRainbow;
 			obj.showVelocityLines=uVars.showVelocityLines;
 			
 			var fillcolor;
