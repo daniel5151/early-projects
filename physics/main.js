@@ -247,23 +247,25 @@ function circlePhys (obj,dt) {
 			var dist = Math.sqrt(distX*distX + distY*distY);
 			var minDist = objects[i].r + obj.r;
 			if (dist < minDist) {
-				var aCol = Math.atan2(distY, distX);
-				
 				var v1 = Math.sqrt(Math.pow(obj.dx,2)+Math.pow(obj.dy,2));
 				var v2 = Math.sqrt(Math.pow(objects[i].dx,2)+Math.pow(objects[i].dy,2));
 				
+				var cAngle = Math.atan2(distY, distX);
 				var vAngle1=Math.atan2(obj.dy, obj.dx);
 				var vAngle2=Math.atan2(objects[i].dy, objects[i].dx);
 				
+				console.log(cAngle/Math.PI)
+				
+				// aliases, no actual purpose aside from readability
 				var m1 = obj.mass;
 				var m2 = objects[i].mass;
 				
 				// These are actual textbook physics equations for perfectly elastic collision.
 				// For explanation, visit http://williamecraver.wix.com/elastic-equations
-				obj.dx = (v1*Math.cos(vAngle1-aCol)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-aCol))/(m1+m2)*Math.cos(aCol)+v1*Math.sin(vAngle1-aCol)*Math.cos(aCol+Math.PI/2);
-				obj.dy = (v1*Math.cos(vAngle1-aCol)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-aCol))/(m1+m2)*Math.sin(aCol)+v1*Math.sin(vAngle1-aCol)*Math.sin(aCol+Math.PI/2);
-				objects[i].dx = (v2*Math.cos(vAngle2-aCol)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-aCol))/(m1+m2)*Math.cos(aCol)+v2*Math.sin(vAngle2-aCol)*Math.cos(aCol+Math.PI/2);
-				objects[i].dy = (v2*Math.cos(vAngle2-aCol)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-aCol))/(m1+m2)*Math.sin(aCol)+v2*Math.sin(vAngle2-aCol)*Math.sin(aCol+Math.PI/2);
+				obj.dx = (v1*Math.cos(vAngle1-cAngle)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-cAngle))/(m1+m2)*Math.cos(cAngle)+v1*Math.sin(vAngle1-cAngle)*Math.cos(cAngle+Math.PI/2);
+				obj.dy = (v1*Math.cos(vAngle1-cAngle)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-cAngle))/(m1+m2)*Math.sin(cAngle)+v1*Math.sin(vAngle1-cAngle)*Math.sin(cAngle+Math.PI/2);
+				objects[i].dx = (v2*Math.cos(vAngle2-cAngle)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-cAngle))/(m1+m2)*Math.cos(cAngle)+v2*Math.sin(vAngle2-cAngle)*Math.cos(cAngle+Math.PI/2);
+				objects[i].dy = (v2*Math.cos(vAngle2-cAngle)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-cAngle))/(m1+m2)*Math.sin(cAngle)+v2*Math.sin(vAngle2-cAngle)*Math.sin(cAngle+Math.PI/2);
 				
 				// These are quasiphysics.
 				// obj.dx -= ax;
@@ -272,8 +274,8 @@ function circlePhys (obj,dt) {
 				// objects[i].dy += ay;
 				
 				// Prevents nastiness.
-				var targetX = obj.x + Math.cos(aCol) * minDist;
-				var targetY = obj.y + Math.sin(aCol) * minDist;
+				var targetX = obj.x + Math.cos(cAngle) * minDist;
+				var targetY = obj.y + Math.sin(cAngle) * minDist;
 				var ax = (targetX - objects[i].x);
 				var ay = (targetY - objects[i].y);
 				
