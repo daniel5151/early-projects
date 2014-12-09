@@ -137,20 +137,33 @@ function initEventHandlers() {
     }, false);
 };
 
-function trackCursor(event, type) {
+function trackCursor (event, type) {
 	if (type == 'mouse') {
 		var rect = canvas.getBoundingClientRect();
-		Cursor.x = event.clientX - rect.left;
-		Cursor.y = Math.floor(event.clientY - rect.top);
-	} else if (type == 'touchmove') {
-		if (event.touches.length == 1) {
-			Cursor.x = event.targetTouches[0].pageX;
-			Cursor.y = event.targetTouches[0].pageY;
+		Cursor.x = event.clientX - rect.left,
+		Cursor.y = Math.floor(event.clientY - rect.top)
+	} else {
+		if (type == 'touchmove') {
+			if (event.touches.length == 1) {
+				Cursor.x = event.targetTouches[0].pageX
+				Cursor.y = event.targetTouches[0].pageY
+			}
+		} else if (type == 'touchstart') {
+			if (event.touches.length == 1) {
+				Cursor.x = event.changedTouches[0].pageX
+				Cursor.y = event.changedTouches[0].pageY
+			}
 		}
-	} else if (type == 'touchstart') {
-		if (event.touches.length == 1) {
-			Cursor.x = event.changedTouches[0].pageX;
-			Cursor.y = event.changedTouches[0].pageY;
+		var obj = canvas;
+		if (obj.offsetParent) {
+			// Every time we find a new object, we add its offsetLeft and offsetTop to curleft and curtop.
+			do {
+				Cursor.x -= obj.offsetLeft;
+				Cursor.y -= obj.offsetTop;
+			}
+			// The while loop can be "while (obj = obj.offsetParent)" only, which does return null
+			// when null is passed back, but that creates a warning in some editors (i.e. VS2010).
+			while ((obj = obj.offsetParent) != null);
 		}
 	}
 }

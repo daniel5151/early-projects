@@ -30,12 +30,14 @@ function update(dt) {
         initGrid(sizes.grid[0], sizes.grid[1]);
         generation=0;
     }
-    document.getElementById('save').onclick = function () {
-        prompt('JSONified Grid',JSON.stringify(grid));
-    }
-    document.getElementById('load').onclick = function () {
-        grid=JSON.parse(prompt('Paste JSON data here:'));
-    }
+    // document.getElementById('save').onclick = function () {
+        // prompt('JSONified Grid',JSON.stringify(grid));
+    // }
+    // document.getElementById('load').onclick = function () {
+        // var newGrid = JSON.parse(prompt('Paste JSON data here:'));
+		
+		// grid = newGrid;
+    // }
     random = ($("#random").attr('checked'));
     var speed = $("#speed").val() * 0.1;
     
@@ -206,6 +208,4 @@ function init() {
     main()
 }
 
-window.onload = function () {
-    init()
-}
+window.onload = init;
