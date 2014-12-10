@@ -271,7 +271,7 @@ function circlePhys (obj,dt) {
 				objects[i].dx = (v2*Math.cos(vAngle2-cAngle)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-cAngle))/(m1+m2)*Math.cos(cAngle)+v2*Math.sin(vAngle2-cAngle)*Math.cos(cAngle+Math.PI/2);
 				objects[i].dy = (v2*Math.cos(vAngle2-cAngle)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-cAngle))/(m1+m2)*Math.sin(cAngle)+v2*Math.sin(vAngle2-cAngle)*Math.sin(cAngle+Math.PI/2);
 				
-				// These are quasiphysics.
+				// These are quasiphysics. Vestigial code left behind from a bygone era.
 				// obj.dx -= ax;
 				// obj.dy -= ay;
 				// objects[i].dx += ax;
@@ -817,11 +817,15 @@ function updateVars () {
             }
         }
     }
-
+	
     /* Accelerometer and Gravity */
     var accel = ($('#accel').prop('checked')) ? true : false;
     if (accel) {
-        if (uVars.debug) {
+        if (accelPrompt) {
+			alert('You have to manually lock your screen orientation though, ok?')
+			accelPrompt=false;
+		}
+		if (uVars.debug) {
             draw.extraDraw.accel = function () {
                 draw.writeMessage(input.Accelerometer.ax+', '+input.Accelerometer.ay+', '+input.Accelerometer.az, 10, canvas.h-80);
                 draw.writeMessage(input.Accelerometer.cx+', '+input.Accelerometer.cy+', '+input.Accelerometer.cz, 10, canvas.h-50);
@@ -848,6 +852,8 @@ function updateVars () {
         uVars.gravity.strength = $( "#gravSlide" ).val();
         uVars.gravity.dx=Math.cos(uVars.gravity.angle)*uVars.gravity.strength;
         uVars.gravity.dy=Math.sin(uVars.gravity.angle)*uVars.gravity.strength;
+		
+		accelPrompt=true;
     }
 
     /* Saving the Image */
@@ -867,6 +873,8 @@ function updateVars () {
         auxTools.currTool=auxTools.currToolNew;
     }
 }
+
+var accelPrompt;
 
 // Call tools on user interact
 var userInteract = {
