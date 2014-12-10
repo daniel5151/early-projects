@@ -234,6 +234,10 @@ function circlePhys (obj,dt) {
 	
 	dt = dt/75;
 	
+	// Gravity
+    obj.dx+=uVars.gravity.dx*dt;
+    obj.dy+=uVars.gravity.dy*dt;
+	
     //Apply Motion
     obj.x+=obj.dx*dt;
     obj.y+=obj.dy*dt;
@@ -281,14 +285,16 @@ function circlePhys (obj,dt) {
 				
 				obj.x -= ax;
 				obj.y -= ay;
-				objects[i].x += ax;
-				objects[i].y += ay;
+				// objects[i].x += ax;
+				// objects[i].y += ay;
 				
 				// add a bit of "padding" to the collision, thereby making it not perfectly elastic
 				obj.dx *= 0.9;
 				obj.dy *= 0.9;
 				objects[i].dx *= 0.9;
 				objects[i].dy *= 0.9;
+				
+				
 			}
 		}
 	}
@@ -302,10 +308,6 @@ function circlePhys (obj,dt) {
     //Bounding Box Constraints and wall friction
     if (obj.y + obj.dy*dt + obj.r > h || obj.y + obj.dy*dt - obj.r < 0){ obj.dy = -obj.dy*0.75; obj.dx = obj.dx*0.99;}
     if (obj.x + obj.dx*dt + obj.r > w || obj.x + obj.dx*dt - obj.r < 0){ obj.dx = -obj.dx*0.75; obj.dy = obj.dy*0.99;}
-
-    // Gravity
-    obj.dx+=uVars.gravity.dx*dt;
-    obj.dy+=uVars.gravity.dy*dt;
 }
 
 // Paused
@@ -890,6 +892,13 @@ $(document).keypress(function(event){
     if(keycode == '32'){
         pause();
     }
+});
+
+$(window).blur(function(){
+  pause()
+});
+$(window).focus(function(){
+  pause()
 });
 
 // UTILITY FUNCTIONS
