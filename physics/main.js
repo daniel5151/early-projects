@@ -6,7 +6,6 @@ var handles = {
 };
 
 // Declare global object container
-var ids = 0;
 var objects = {};
 
 // Variables
@@ -181,6 +180,15 @@ var draw = {
 
 			// Velocity Lines
 			if (obj.showVelocityLines) { draw.velocityLine(obj.x,obj.y,obj.dx,obj.dy); }
+		},
+		line:function(obj){
+			canvas.ctx.beginPath();
+			canvas.ctx.strokeStyle = obj.color;
+			canvas.ctx.lineWidth = obj.selected?3:1;
+			canvas.ctx.moveTo(obj.point1.x,obj.point1.y);
+			canvas.ctx.lineTo(obj.point2.x,obj.point2.y);
+			canvas.ctx.closePath();
+			canvas.ctx.stroke();
 		}
 	},
 	
@@ -209,7 +217,7 @@ var draw = {
 
 		/* Draw All */
 		for (var c = keys.length, n = 0; n < c; n++) {
-			draw.shape.circle(objects[keys[n]]);
+			draw.shape[objects[keys[n]].type](objects[keys[n]]);
 		}
 
 		/* Execute any extra drawing functions */
@@ -228,86 +236,92 @@ var draw = {
 };
 
 // Physics
-function circlePhys (obj,dt) {
-    var h = canvas.h;
+function phys (obj,dt) {
+    // aliases, for ease of use
+	var h = canvas.h;
     var w = canvas.w;
 	
+	// scalable time
 	dt = dt/75;
 	
-	// Gravity
-    obj.dx+=uVars.gravity.dx*dt;
-    obj.dy+=uVars.gravity.dy*dt;
-	
-    //Apply Motion
-    obj.x+=obj.dx*dt;
-    obj.y+=obj.dy*dt;
+	if (obj.type=="circle") {
+		// Gravity
+		obj.dx+=uVars.gravity.dx*dt;
+		obj.dy+=uVars.gravity.dy*dt;
+		
+		//Apply Motion
+		obj.x+=obj.dx*dt;
+		obj.y+=obj.dy*dt;
 
-	// Collision
-	if (Object.keys(objects).length>1) {
-		for (var i in objects) {
-			if (objects[i].id==obj.id) { continue; }
-			var distX = objects[i].x - obj.x;
-			var distY = objects[i].y - obj.y;
-			var dist = Math.sqrt(distX*distX + distY*distY);
-			var minDist = objects[i].r + obj.r;
-			if (dist < minDist) {
-				var v1 = Math.sqrt(Math.pow(obj.dx,2)+Math.pow(obj.dy,2));
-				var v2 = Math.sqrt(Math.pow(objects[i].dx,2)+Math.pow(objects[i].dy,2));
-				
-				var cAngle = Math.atan2(distY, distX);
-				var vAngle1=Math.atan2(obj.dy, obj.dx);
-				var vAngle2=Math.atan2(objects[i].dy, objects[i].dx);
-				
-				console.log(cAngle/Math.PI)
-				
-				// aliases, no actual purpose aside from readability
-				var m1 = obj.mass;
-				var m2 = objects[i].mass;
-				
-				// These are actual textbook physics equations for perfectly elastic collision.
-				// For explanation, visit http://williamecraver.wix.com/elastic-equations
-				obj.dx = (v1*Math.cos(vAngle1-cAngle)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-cAngle))/(m1+m2)*Math.cos(cAngle)+v1*Math.sin(vAngle1-cAngle)*Math.cos(cAngle+Math.PI/2);
-				obj.dy = (v1*Math.cos(vAngle1-cAngle)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-cAngle))/(m1+m2)*Math.sin(cAngle)+v1*Math.sin(vAngle1-cAngle)*Math.sin(cAngle+Math.PI/2);
-				objects[i].dx = (v2*Math.cos(vAngle2-cAngle)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-cAngle))/(m1+m2)*Math.cos(cAngle)+v2*Math.sin(vAngle2-cAngle)*Math.cos(cAngle+Math.PI/2);
-				objects[i].dy = (v2*Math.cos(vAngle2-cAngle)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-cAngle))/(m1+m2)*Math.sin(cAngle)+v2*Math.sin(vAngle2-cAngle)*Math.sin(cAngle+Math.PI/2);
-				
-				// These are quasiphysics. Vestigial code left behind from a bygone era.
-				// obj.dx -= ax;
-				// obj.dy -= ay;
-				// objects[i].dx += ax;
-				// objects[i].dy += ay;
-				
-				// Prevents nastiness.
-				var targetX = obj.x + Math.cos(cAngle) * minDist;
-				var targetY = obj.y + Math.sin(cAngle) * minDist;
-				var ax = (targetX - objects[i].x);
-				var ay = (targetY - objects[i].y);
-				
-				obj.x -= ax;
-				obj.y -= ay;
-				// objects[i].x += ax;
-				// objects[i].y += ay;
-				
-				// add a bit of "padding" to the collision, thereby making it not perfectly elastic
-				obj.dx *= 0.9;
-				obj.dy *= 0.9;
-				objects[i].dx *= 0.9;
-				objects[i].dy *= 0.9;
-				
-				
+		// Collision
+		if (Object.keys(objects).length>1) {
+			for (var i in objects) {
+				if (objects[i].id==obj.id) { continue; }
+				var distX = objects[i].x - obj.x;
+				var distY = objects[i].y - obj.y;
+				var dist = Math.sqrt(distX*distX + distY*distY);
+				var minDist = objects[i].r + obj.r;
+				if (dist < minDist) {
+					var v1 = Math.sqrt(Math.pow(obj.dx,2)+Math.pow(obj.dy,2));
+					var v2 = Math.sqrt(Math.pow(objects[i].dx,2)+Math.pow(objects[i].dy,2));
+					
+					var cAngle = Math.atan2(distY, distX);
+					var vAngle1=Math.atan2(obj.dy, obj.dx);
+					var vAngle2=Math.atan2(objects[i].dy, objects[i].dx);
+					
+					// console.log(cAngle/Math.PI)
+					
+					// aliases, no actual purpose aside from readability
+					var m1 = obj.mass;
+					var m2 = objects[i].mass;
+					
+					// These are actual textbook physics equations for perfectly elastic collision.
+					// For explanation, visit http://williamecraver.wix.com/elastic-equations
+					obj.dx = (v1*Math.cos(vAngle1-cAngle)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-cAngle))/(m1+m2)*Math.cos(cAngle)+v1*Math.sin(vAngle1-cAngle)*Math.cos(cAngle+Math.PI/2);
+					obj.dy = (v1*Math.cos(vAngle1-cAngle)*(m1-m2)+2*m2*v2*Math.cos(vAngle2-cAngle))/(m1+m2)*Math.sin(cAngle)+v1*Math.sin(vAngle1-cAngle)*Math.sin(cAngle+Math.PI/2);
+					objects[i].dx = (v2*Math.cos(vAngle2-cAngle)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-cAngle))/(m1+m2)*Math.cos(cAngle)+v2*Math.sin(vAngle2-cAngle)*Math.cos(cAngle+Math.PI/2);
+					objects[i].dy = (v2*Math.cos(vAngle2-cAngle)*(m2-m1)+2*m1*v1*Math.cos(vAngle1-cAngle))/(m1+m2)*Math.sin(cAngle)+v2*Math.sin(vAngle2-cAngle)*Math.sin(cAngle+Math.PI/2);
+					
+					// These are quasiphysics. Vestigial code left behind from a bygone era.
+					// obj.dx -= ax;
+					// obj.dy -= ay;
+					// objects[i].dx += ax;
+					// objects[i].dy += ay;
+					
+					// Prevents nastiness.
+					var targetX = obj.x + Math.cos(cAngle) * minDist;
+					var targetY = obj.y + Math.sin(cAngle) * minDist;
+					var ax = (targetX - objects[i].x);
+					var ay = (targetY - objects[i].y);
+					
+					obj.x -= ax;
+					obj.y -= ay;
+					// objects[i].x += ax;
+					// objects[i].y += ay;
+					
+					// add a bit of "padding" to the collision, thereby making it not perfectly elastic
+					obj.dx *= 0.9;
+					obj.dy *= 0.9;
+					objects[i].dx *= 0.9;
+					objects[i].dy *= 0.9;
+				}
 			}
+			
+			// equations for collision with line, WIP:
+			// obj.dx = v1*Math.sin(Math.PI/2 - vAngle1 - 2 (lnAngle))
+			// obj.dy = v1*Math.cos(Math.PI/2 - vAngle1 - 2 (lnAngle))
 		}
-	}
-	
-    //Check if Out of Bounds
-    if (obj.y+obj.r > h) { obj.y=h-obj.r; }
-    if (obj.y-obj.r < 0) { obj.y=0+obj.r; }
-    if (obj.x+obj.r > w) { obj.x=w-obj.r; }
-    if (obj.x-obj.r < 0) { obj.x=0+obj.r; }
+		
+		//Check if Out of Bounds
+		if (obj.y+obj.r > h) { obj.y=h-obj.r; }
+		if (obj.y-obj.r < 0) { obj.y=0+obj.r; }
+		if (obj.x+obj.r > w) { obj.x=w-obj.r; }
+		if (obj.x-obj.r < 0) { obj.x=0+obj.r; }
 
-    //Bounding Box Constraints and wall friction
-    if (obj.y + obj.dy*dt + obj.r > h || obj.y + obj.dy*dt - obj.r < 0){ obj.dy = -obj.dy*0.75; obj.dx = obj.dx*0.99;}
-    if (obj.x + obj.dx*dt + obj.r > w || obj.x + obj.dx*dt - obj.r < 0){ obj.dx = -obj.dx*0.75; obj.dy = obj.dy*0.99;}
+		//Bounding Box Constraints and wall friction
+		if (obj.y + obj.dy*dt + obj.r > h || obj.y + obj.dy*dt - obj.r < 0){ obj.dy = -obj.dy*0.75; obj.dx = obj.dx*0.99;}
+		if (obj.x + obj.dx*dt + obj.r > w || obj.x + obj.dx*dt - obj.r < 0){ obj.dx = -obj.dx*0.75; obj.dy = obj.dy*0.99;}
+	}
 }
 
 // Paused
@@ -320,7 +334,7 @@ function mainPhysLoop (dt) {
     if (!paused) {
 		for (var key in objects) {
             if (objects[key].suspendPhysics!==true) {
-                circlePhys(objects[key],dt);
+                phys(objects[key],dt);
             }
         }
     } else {
@@ -358,6 +372,27 @@ var shapes = {
         this.colorByHeight=uVars.colorByHeight;
 		this.colorByVelocity=uVars.colorByVelocity;
         this.showVelocityLines=uVars.showVelocityLines;
+	},
+	Line:function (props) {
+		// defaults
+        this.type='line';
+		this.color=getRandomColor();
+		this.id=ids;
+		this.point1={
+			x:100,
+			y:100
+		};
+		this.point2={
+			x:200,
+			y:200
+		};
+		
+		this.selected=false;
+		
+        // customs
+        for (var prop in props) {
+            this[prop]=props[prop];
+        }
 	}
 };
 
@@ -368,6 +403,7 @@ function checkClick(obj) {
 	return (canvas.ctx.isPointInPath(input.Cursor.x, input.Cursor.y)) ? true : false;
 }
 
+var ids = 0;
 function getNewId() {
 	if (ids==uVars.maxObjects) {
 		ids=0;
@@ -375,6 +411,8 @@ function getNewId() {
 		ids+=1;
 	}
 	return ids;
+	
+	
 }
 
 // Tools and Axillary tool Functions
