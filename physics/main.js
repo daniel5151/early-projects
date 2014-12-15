@@ -646,6 +646,31 @@ var tools={
             // NULL
         },
     },
+	/////////////////////////////////////////////////////
+	tool_spawn_line:{
+        name:'tool_spawn_line',
+        description:'Make a line - WIP',
+        onStart:function () {
+			if (handles.toolHandle === null) { // Throw only once
+                auxTools.basePos=[input.Cursor.x, input.Cursor.y]
+				getNewId()
+                objects[ids] = new shapes.Line({color:uVars.shapeColor, point1:{x:auxTools.basePos[0],y:auxTools.basePos[1]}, point2:input.Cursor});
+                objects[ids].selected=true;
+				auxTools.basePos=[input.Cursor.x, input.Cursor.y]
+				handles.toolHandle = setInterval(function () {
+					objects[ids].point2=input.Cursor;
+				},10)
+            }
+        },
+        onEnd:function () {
+            if (handles.toolHandle !== null) { // Not to throw again
+                objects[ids].selected=false;
+				
+                clearInterval(handles.toolHandle);
+                handles.toolHandle = null;
+            }
+        }
+    },
     /////////////////////////////////////////////////////
     tool_info_panel:{
         name:'tool_info_panel',
@@ -940,12 +965,12 @@ $(document).keypress(function(event){
     }
 });
 
-$(window).blur(function(){
-  pause()
-});
-$(window).focus(function(){
-  pause()
-});
+// $(window).blur(function(){
+  // pause()
+// });
+// $(window).focus(function(){
+  // pause()
+// });
 
 // UTILITY FUNCTIONS
 function getRandomColor() { 
