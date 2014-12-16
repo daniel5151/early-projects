@@ -117,11 +117,11 @@ var draw = {
 		canvas.ctx.beginPath();
 		canvas.ctx.lineWidth = selected ? 3 : 1;
 		canvas.ctx.arc(x, y, r, 0, Math.PI * 2, false);
-		canvas.ctx.closePath();
 		canvas.ctx.fillStyle = color;
 		canvas.ctx.fill();
 		canvas.ctx.strokeStyle = 'black';
 		canvas.ctx.stroke();
+		canvas.ctx.closePath();
 	},
 	writeMessage: function(message, x, y) {
 		var ctx = canvas.ctx;
@@ -200,8 +200,26 @@ var draw = {
 		},
 		line: function(obj) {
 			canvas.ctx.beginPath();
-			canvas.ctx.strokeStyle = obj.color;
+			
 			canvas.ctx.lineWidth = obj.selected ? 3 : obj.thick;
+			if ( (distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick+5) && (tools.vars.currTool=='tool_move') ) {
+				canvas.ctx.fillStyle = obj.color;
+				
+				canvas.ctx.beginPath();
+				canvas.ctx.arc(obj.point1.x, obj.point1.y, 5, 0, Math.PI * 2, false);
+				canvas.ctx.fill();
+				canvas.ctx.closePath();
+				
+				canvas.ctx.beginPath();
+				canvas.ctx.arc(obj.point2.x, obj.point2.y, 5, 0, Math.PI * 2, false);
+				canvas.ctx.fill();
+				canvas.ctx.closePath();
+				
+				canvas.ctx.lineWidth = 3
+			}
+			
+			canvas.ctx.beginPath();
+			canvas.ctx.strokeStyle = obj.color;
 			canvas.ctx.moveTo(obj.point1.x, obj.point1.y);
 			canvas.ctx.lineTo(obj.point2.x, obj.point2.y);
 			canvas.ctx.closePath();
@@ -286,35 +304,40 @@ function phys(obj, dt) {
 		obj.pos.y += obj.vel.dy * dt;
 
 		// Collision
-		if (Object.keys(objects).length > 1) {
-			for (var i in objects) {
-				if (objects[i].id == obj.id) {
-					continue;
-				}
-				var distX = objects[i].pos.x - obj.pos.x;
-				var distY = objects[i].pos.y - obj.pos.y;
+		for (var i in objects) {
+			//alias
+			var obj2 = objects[i];
+			
+			if (obj2.id == obj.id) {
+				continue;
+			}
+			
+			if (obj2.type === 'circle') {
+				//Collision with other balls
+				var distX = obj2.pos.x - obj.pos.x;
+				var distY = obj2.pos.y - obj.pos.y;
 				var dist = Math.sqrt(distX * distX + distY * distY);
-				var minDist = objects[i].r + obj.r;
+				var minDist = obj2.r + obj.r;
 				if (dist < minDist) {
 					var v1 = Math.sqrt(Math.pow(obj.vel.dx, 2) + Math.pow(obj.vel.dy, 2));
-					var v2 = Math.sqrt(Math.pow(objects[i].vel.dx, 2) + Math.pow(objects[i].vel.dy, 2));
+					var v2 = Math.sqrt(Math.pow(obj2.vel.dx, 2) + Math.pow(obj2.vel.dy, 2));
 
 					var cAngle = Math.atan2(distY, distX);
 					var vAngle1 = Math.atan2(obj.vel.dy, obj.vel.dx);
-					var vAngle2 = Math.atan2(objects[i].vel.dy, objects[i].vel.dx);
+					var vAngle2 = Math.atan2(obj2.vel.dy, obj2.vel.dx);
 
 					// console.log(cAngle/Math.PI)
 
 					// aliases, no actual purpose aside from readability
 					var m1 = obj.mass;
-					var m2 = objects[i].mass;
+					var m2 = obj2.mass;
 
 					// These are actual textbook physics equations for perfectly elastic collision.
 					obj.vel = {
 						dx:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.cos(cAngle + Math.PI / 2),
 						dy:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.sin(cAngle + Math.PI / 2),
 					}
-					objects[i].vel = {
+					obj2.vel = {
 						dx:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.cos(cAngle + Math.PI / 2),
 						dy:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.sin(cAngle + Math.PI / 2),
 					}
@@ -322,31 +345,46 @@ function phys(obj, dt) {
 					// Prevents nastiness.
 					var targetX = obj.pos.x + Math.cos(cAngle) * minDist;
 					var targetY = obj.pos.y + Math.sin(cAngle) * minDist;
-					var ax = (targetX - objects[i].pos.x);
-					var ay = (targetY - objects[i].pos.y);
+					var ax = (targetX - obj2.pos.x);
+					var ay = (targetY - obj2.pos.y);
 
 					// These are quasiphysics. Vestigial code left behind from a bygone era.
 					// obj.dx -= ax;
 					// obj.dy -= ay;
-					// objects[i].dx += ax;
-					// objects[i].dy += ay;
+					// obj2.dx += ax;
+					// obj2.dy += ay;
 
 					obj.pos.x -= ax;
 					obj.pos.y -= ay;
-					//objects[i].x += ax;
-					//objects[i].y += ay;
+					obj2.pos.x += ax*0.95;
+					obj2.pos.y += ay*0.95;
 
 					// add a bit of "padding" to the collision, thereby making it not perfectly elastic
 					obj.vel.dx *= 0.9;
 					obj.vel.dy *= 0.9;
-					objects[i].vel.dx *= 0.9;
-					objects[i].vel.dy *= 0.9;
+					obj2.vel.dx *= 0.9;
+					obj2.vel.dy *= 0.9;
+				}
+			} else if (obj2.type === 'line') {
+				// Collision with a line
+				var dist = distanceFromLineSegment(obj2.point1, obj2.point2, obj.pos);
+				if ( dist < obj.r) {
+					// obj.pos.x -= obj.vel.dx*dt;
+					// obj.pos.y -= obj.vel.dy*dt;
+					
+					var v = Math.sqrt(Math.pow(obj.vel.dx, 2) + Math.pow(obj.vel.dy, 2));
+					var vAngle = Math.atan2(obj.vel.dy, obj.vel.dx);
+					var lineAngle = Math.atan2((obj2.point2.y-obj2.point1.y),(obj2.point2.x-obj2.point1.x));
+					
+					if ((vAngle >= Math.PI/2 && vAngle <= Math.PI)||(vAngle >= 3*Math.PI/2 && vAngle <= 2*Math.PI)) {
+						obj.vel.dx = v*Math.cos(vAngle - 2 * (lineAngle))
+						obj.vel.dy = v*Math.sin(vAngle - 2 * (lineAngle))
+					} else {
+						obj.vel.dx = v*Math.cos(vAngle + 2 * (lineAngle))
+						obj.vel.dy = v*Math.sin(vAngle + 2 * (lineAngle))
+					}
 				}
 			}
-
-			// equations for collision with line, WIP:
-			// obj.dx = v1*Math.sin(Math.PI/2 - vAngle1 - 2 (lnAngle))
-			// obj.dy = v1*Math.cos(Math.PI/2 - vAngle1 - 2 (lnAngle))
 		}
 
 		//Check if Out of Bounds
@@ -617,6 +655,39 @@ var tools = {
 		}
 	},
 	/////////////////////////////////////////////////////
+	tool_spawn_line: {
+		name: 'tool_spawn_line',
+		description: 'Spawn Line - Very WIP',
+		onStart: function() {
+			if (handles.toolHandle === null) { // Throw only once
+				tools.vars.basePos = input.Cursor;
+				getNewId()
+				objects[ids] = new shapes.Line({
+					color: uVars.shapeColor,
+					point1: tools.vars.basePos,
+					point2: input.Cursor
+				});
+				objects[ids].selected = true;
+				handles.toolHandle = setInterval(function() {
+					objects[ids].point2 = input.Cursor;
+				}, 10)
+			}
+		},
+		onEnd: function() {
+			if (handles.toolHandle !== null) { // Not to throw again
+				objects[ids].selected = false;
+				
+				if (lineDistance(objects[ids].point1, objects[ids].point2)<1) {
+					delete objects[ids];
+					ids--;
+				}
+				
+				clearInterval(handles.toolHandle);
+				handles.toolHandle = null;
+			}
+		}
+	},
+	/////////////////////////////////////////////////////
 	tool_slingshot: {
 		name: 'tool_slingshot',
 		description: 'Slingshot',
@@ -666,7 +737,7 @@ var tools = {
 				obj.selected = true;
 				obj.suspendPhysics = true;
 				
-				if (obj.type=='circle') {
+				if (obj.type === 'circle') {
 					tools.vars.offCentrePos = {
 						x: input.Cursor.x - obj.pos.x,
 						y: input.Cursor.y - obj.pos.y
@@ -682,26 +753,41 @@ var tools = {
 							dy:0
 						};
 					}, 10);
-				} else if (obj.type == 'line') {
-					obj.pos = centerOfLine(obj.point1, obj.point2)
-					
-					var midToX = (obj.point1.x-obj.point2.x)/2;
-					var midToY = (obj.point1.y-obj.point2.y)/2;
-					
-					tools.vars.offCentrePos = {
-						x: input.Cursor.x - obj.pos.x,
-						y: input.Cursor.y - obj.pos.y
-					}
-					
-					handles.toolHandle = setInterval(function() {
-						obj.pos.x = input.Cursor.x - tools.vars.offCentrePos.x;
-						obj.pos.y = input.Cursor.y - tools.vars.offCentrePos.y;
+				} else if (obj.type === 'line') {
+					if (lineDistance(input.Cursor, obj.point1) < 5) {
+						handles.toolHandle = setInterval(function() {
+							obj.point1 = input.Cursor;
+						}, 10);
+					} else if (lineDistance(input.Cursor, obj.point2) < 5) {
+						handles.toolHandle = setInterval(function() {
+							obj.point2 = input.Cursor;
+						}, 10);
+					} else { // When the cursor is on the line, but not it's endpoints
+						obj.pos = centerOfLine(obj.point1, obj.point2)
 						
-						obj.point1.x = input.Cursor.x - midToX;
-						obj.point1.y = input.Cursor.y - midToY;
-						obj.point2.x = input.Cursor.x + midToX;
-						obj.point2.y = input.Cursor.y + midToY;
-					}, 10);
+						var midToX = (obj.point1.x-obj.point2.x)/2;
+						var midToY = (obj.point1.y-obj.point2.y)/2;
+						
+						tools.vars.offCentrePos = {
+							x: input.Cursor.x - obj.pos.x,
+							y: input.Cursor.y - obj.pos.y
+						}
+						
+						var grabToX1 = input.Cursor.x - obj.point1.x
+						var grabToY1 = input.Cursor.y - obj.point1.y
+						var grabToX2 = input.Cursor.x - obj.point2.x
+						var grabToY2 = input.Cursor.y - obj.point2.y
+						
+						handles.toolHandle = setInterval(function() {
+							obj.pos.x = input.Cursor.x - tools.vars.offCentrePos.x;
+							obj.pos.y = input.Cursor.y - tools.vars.offCentrePos.y;
+							
+							obj.point1.x = input.Cursor.x - grabToX1;
+							obj.point1.y = input.Cursor.y - grabToY1;
+							obj.point2.x = input.Cursor.x - grabToX2;
+							obj.point2.y = input.Cursor.y - grabToY2;
+						}, 10);
+					}
 				}
 			}
 		},
@@ -794,34 +880,6 @@ var tools = {
 		},
 	},
 	/////////////////////////////////////////////////////
-	tool_spawn_line: {
-		name: 'tool_spawn_line',
-		description: 'Make a line - WIP',
-		onStart: function() {
-			if (handles.toolHandle === null) { // Throw only once
-				tools.vars.basePos = input.Cursor;
-				getNewId()
-				objects[ids] = new shapes.Line({
-					color: uVars.shapeColor,
-					point1: tools.vars.basePos,
-					point2: input.Cursor
-				});
-				objects[ids].selected = true;
-				handles.toolHandle = setInterval(function() {
-					objects[ids].point2 = input.Cursor;
-				}, 10)
-			}
-		},
-		onEnd: function() {
-			if (handles.toolHandle !== null) { // Not to throw again
-				objects[ids].selected = false;
-
-				clearInterval(handles.toolHandle);
-				handles.toolHandle = null;
-			}
-		}
-	},
-	/////////////////////////////////////////////////////
 	tool_info_panel: {
 		name: 'tool_info_panel',
 		description: 'Info Panel',
@@ -844,7 +902,7 @@ var tools = {
 							}
 						}
 					};
-				}, 1000 / uVars.fps);
+				}, 10 / uVars.fps);
 			}
 		},
 		onEnd: function(obj) {
@@ -959,32 +1017,6 @@ function checkClick(obj) {
 	}
 }
 
-function distanceFromLineSegment (point1, point2, testPoint) {
-	var lineLength = lineDistance(point1, point2)
-	var distStartPoint = lineDistance(input.Cursor, point1)
-	var distEndPoint = lineDistance(input.Cursor, point2)
-	
-	if (Math.pow(distEndPoint,2) > Math.pow(distStartPoint,2) + Math.pow(lineLength,2)) {
-		return distStartPoint
-	} else if (Math.pow(distStartPoint,2) > Math.pow(distEndPoint,2) + Math.pow(lineLength,2)) {
-		return distEndPoint
-	} else {
-		// Heron's formula to find "height" of triangle composed of line segment, and lines connecting
-		// each end point with the cursor.
-		var s = (distStartPoint+distEndPoint+lineLength)/2
-		var distToLine = 2/lineLength * Math.sqrt(s*(s-distStartPoint)*(s-distEndPoint)*(s-lineLength))
-		return distToLine;
-	}
-
-}
-
-function centerOfLine (point1, point2) {
-	return {
-		x:(point1.x+point2.x)/2,
-		y:(point1.y+point2.y)/2
-	};
-}
-
 // Track User Actions
 var input = {
 	cursorType: 'default',
@@ -1067,7 +1099,7 @@ var panels = {
 			if (tool == "vars") {
 				continue
 			}
-			$('#toolbar').append('<a href="#"><div id=' + tools[tool].name + ' class=\'toolButton\'>' + tools[tool].description + '</div></a><br>');
+			$('#toolbar').append('<a href="#"><div id=' + tools[tool].name + ' class=\'toolButton\'>' + tools[tool].description + '</div></a>');
 		}
 	},
 	pushPushables: function(em) {
@@ -1285,3 +1317,28 @@ getColorByVelocity = function(dx, dy) {
 	}
 	return velocityColoring;
 };
+
+function distanceFromLineSegment (point1, point2, testPoint) {
+	var lineLength = lineDistance(point1, point2)
+	var distStartPoint = lineDistance(testPoint, point1)
+	var distEndPoint = lineDistance(testPoint, point2)
+	
+	if (Math.pow(distEndPoint,2) > Math.pow(distStartPoint,2) + Math.pow(lineLength,2)) {
+		return distStartPoint
+	} else if (Math.pow(distStartPoint,2) > Math.pow(distEndPoint,2) + Math.pow(lineLength,2)) {
+		return distEndPoint
+	} else {
+		// Heron's formula to find "height" of triangle composed of line segment, and lines connecting
+		// each end point with the cursor.
+		var s = (distStartPoint+distEndPoint+lineLength)/2
+		var distToLine = 2/lineLength * Math.sqrt(s*(s-distStartPoint)*(s-distEndPoint)*(s-lineLength))
+		return distToLine;
+	}
+}
+
+function centerOfLine (point1, point2) {
+	return {
+		x:(point1.x+point2.x)/2,
+		y:(point1.y+point2.y)/2
+	};
+}
