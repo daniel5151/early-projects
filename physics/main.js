@@ -532,11 +532,23 @@ var tools = {
 		finalPos: {},
 		offCentrePos: {}
 	},
-
+	
+	/////////////////////////////////////////////////////
+	tool_delete: {
+		name: 'tool_delete',
+		description: 'Delete',
+		worksOn:['circle','line'],
+		onStart: function(selectedObj) {
+			delete objects[selectedObj.id]
+		},
+		onEnd: function() {
+			// N/A
+		},
+	},
 	/////////////////////////////////////////////////////
 	tool_spawn: {
 		name: 'tool_spawn',
-		description: 'Spawn',
+		description: 'Spawn Ball',
 		onStart: function() {
 			handles.toolHandle = setInterval(function() {
 				getNewId()
@@ -556,7 +568,7 @@ var tools = {
 	/////////////////////////////////////////////////////
 	tool_spawn_slingshot: {
 		name: 'tool_spawn_slingshot',
-		description: 'Spawn + Slingshot',
+		description: 'Spawn Ball + Slingshot',
 		onStart: function() {
 			if (handles.toolHandle === null) { // Throw only once
 				getNewId()
@@ -629,16 +641,42 @@ var tools = {
 			if (handles.toolHandle === null) {
 				selectedObj.selected = true;
 				selectedObj.suspendPhysics = true;
-				tools.vars.offCentrePos = {
-					x: input.Cursor.x - selectedObj.x,
-					y: input.Cursor.y - selectedObj.y
-				};
-				handles.toolHandle = setInterval(function() {
-					selectedObj.x = input.Cursor.x - tools.vars.offCentrePos.x;
-					selectedObj.y = input.Cursor.y - tools.vars.offCentrePos.y;
-					selectedObj.dx = 0;
-					selectedObj.dy = 0;
-				}, 1);
+				
+				if (selectedObj.type=='circle') {
+					tools.vars.offCentrePos = {
+						x: input.Cursor.x - selectedObj.x,
+						y: input.Cursor.y - selectedObj.y
+					}
+					
+					handles.toolHandle = setInterval(function() {
+						selectedObj.x = input.Cursor.x - tools.vars.offCentrePos.x;
+						selectedObj.y = input.Cursor.y - tools.vars.offCentrePos.y;
+						selectedObj.dx = 0;
+						selectedObj.dy = 0;
+					}, 10);
+				} else if (selectedObj.type=='line') {
+					var midpoint = {
+						x:(selectedObj.point1.x+selectedObj.point2.x)/2,
+						y:(selectedObj.point1.y+selectedObj.point2.y)/2
+					}
+					var midToX = (selectedObj.point1.x-selectedObj.point2.x)/2;
+					var midToY = (selectedObj.point1.y-selectedObj.point2.y)/2;
+					
+					tools.vars.offCentrePos = {
+						x: input.Cursor.x - midpoint.x,
+						y: input.Cursor.y - midpoint.y
+					}
+					
+					handles.toolHandle = setInterval(function() {
+						midpoint.x = input.Cursor.x - tools.vars.offCentrePos.x;
+						midpoint.y = input.Cursor.y - tools.vars.offCentrePos.y;
+						
+						selectedObj.point1.x = input.Cursor.x - midToX;
+						selectedObj.point1.y = input.Cursor.y - midToY;
+						selectedObj.point2.x = input.Cursor.x + midToX;
+						selectedObj.point2.y = input.Cursor.y + midToY;
+					}, 10);
+				}
 			}
 		},
 		onEnd: function(selectedObj) {
@@ -875,7 +913,7 @@ function checkClick(obj) {
 		return (canvas.ctx.isPointInPath(input.Cursor.x, input.Cursor.y)) ? true : false;
 	} else if (obj.type == "line") {
 		// And then, unavoidable math. Yay.
-		if (distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick) { 
+		if (distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick+5) { 
 			return true;
 		} else {
 			return false;
