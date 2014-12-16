@@ -57,11 +57,15 @@ window.onload = function() {
 	setTimeout(function() {
 		objects[0] = new shapes.Circle({
 			color: uVars.shapeColor,
-			x: 100,
-			y: 100,
+			pos:{
+				x: 100,
+				y: 100,
+			},
 			r: 25,
-			dx: randInt(0,10),
-			dy: randInt(0,10),
+			vel:{
+				dx: randInt(0,10),
+				dy: randInt(0,10)
+			},
 			id: 0
 		})
 	}, 10);
@@ -154,10 +158,10 @@ var draw = {
 
 			var fillcolor;
 			if (obj.colorByHeight) {
-				fillcolor = getColorByHeight(obj.y);
+				fillcolor = getColorByHeight(obj.pos.y);
 			}
 			else if (obj.colorByVelocity) {
-				fillcolor = getColorByVelocity(obj.dx, obj.dy);
+				fillcolor = getColorByVelocity(obj.vel.dx, obj.vel.dy);
 			}
 			else if (obj.colorByRainbow) {
 				fillcolor = getRandomColor();
@@ -166,7 +170,7 @@ var draw = {
 				fillcolor = obj.color;
 			}
 
-			draw.circle(obj.x, obj.y, obj.r, fillcolor, obj.selected);
+			draw.circle(obj.pos.x, obj.pos.y, obj.r, fillcolor, obj.selected);
 
 			// Draw Smiley if Need Be
 			if (obj.smiley) {
@@ -174,24 +178,24 @@ var draw = {
 				canvas.ctx.strokeStyle = '#000000';
 				canvas.ctx.lineWidth = 1;
 				canvas.ctx.beginPath();
-				canvas.ctx.arc(obj.x, obj.y - obj.r / 8, obj.r * 0.75, 0.2 * Math.PI, 0.8 * Math.PI, false);
+				canvas.ctx.arc(obj.pos.x, obj.pos.y - obj.r / 8, obj.r * 0.75, 0.2 * Math.PI, 0.8 * Math.PI, false);
 				canvas.ctx.closePath();
 				canvas.ctx.stroke();
 				canvas.ctx.fillStyle = 'white';
 				canvas.ctx.fill();
 
 				// Left Eye
-				draw.circle(obj.x - obj.r / 2, obj.y - obj.r / 4, obj.r / 8, 'white');
-				draw.circle(obj.x - obj.r / 2, obj.y - obj.r / 4, obj.r / 8 / 3, 'black');
+				draw.circle(obj.pos.x - obj.r / 2, obj.pos.y - obj.r / 4, obj.r / 8, 'white');
+				draw.circle(obj.pos.x - obj.r / 2, obj.pos.y - obj.r / 4, obj.r / 8 / 3, 'black');
 
 				// Right Eye
-				draw.circle(obj.x + obj.r / 2, obj.y - obj.r / 4, obj.r / 8, 'white');
-				draw.circle(obj.x + obj.r / 2, obj.y - obj.r / 4, obj.r / 8 / 3, 'black');
+				draw.circle(obj.pos.x + obj.r / 2, obj.pos.y - obj.r / 4, obj.r / 8, 'white');
+				draw.circle(obj.pos.x + obj.r / 2, obj.pos.y - obj.r / 4, obj.r / 8 / 3, 'black');
 			}
 
-			// Velocity Lines
+			// vel Lines
 			if (obj.showVelocityLines) {
-				draw.velocityLine(obj.x, obj.y, obj.dx, obj.dy);
+				draw.velocityLine(obj.pos.x, obj.pos.y, obj.vel.dx, obj.vel.dy);
 			}
 		},
 		line: function(obj) {
@@ -274,12 +278,12 @@ function phys(obj, dt) {
 
 	if (obj.type == "circle") {
 		// Gravity
-		obj.dx += uVars.gravity.dx * dt;
-		obj.dy += uVars.gravity.dy * dt;
+		obj.vel.dx += uVars.gravity.dx * dt;
+		obj.vel.dy += uVars.gravity.dy * dt;
 
 		//Apply Motion
-		obj.x += obj.dx * dt;
-		obj.y += obj.dy * dt;
+		obj.pos.x += obj.vel.dx * dt;
+		obj.pos.y += obj.vel.dy * dt;
 
 		// Collision
 		if (Object.keys(objects).length > 1) {
@@ -287,17 +291,17 @@ function phys(obj, dt) {
 				if (objects[i].id == obj.id) {
 					continue;
 				}
-				var distX = objects[i].x - obj.x;
-				var distY = objects[i].y - obj.y;
+				var distX = objects[i].pos.x - obj.pos.x;
+				var distY = objects[i].pos.y - obj.pos.y;
 				var dist = Math.sqrt(distX * distX + distY * distY);
 				var minDist = objects[i].r + obj.r;
 				if (dist < minDist) {
-					var v1 = Math.sqrt(Math.pow(obj.dx, 2) + Math.pow(obj.dy, 2));
-					var v2 = Math.sqrt(Math.pow(objects[i].dx, 2) + Math.pow(objects[i].dy, 2));
+					var v1 = Math.sqrt(Math.pow(obj.vel.dx, 2) + Math.pow(obj.vel.dy, 2));
+					var v2 = Math.sqrt(Math.pow(objects[i].vel.dx, 2) + Math.pow(objects[i].vel.dy, 2));
 
 					var cAngle = Math.atan2(distY, distX);
-					var vAngle1 = Math.atan2(obj.dy, obj.dx);
-					var vAngle2 = Math.atan2(objects[i].dy, objects[i].dx);
+					var vAngle1 = Math.atan2(obj.vel.dy, obj.vel.dx);
+					var vAngle2 = Math.atan2(objects[i].vel.dy, objects[i].vel.dx);
 
 					// console.log(cAngle/Math.PI)
 
@@ -306,16 +310,20 @@ function phys(obj, dt) {
 					var m2 = objects[i].mass;
 
 					// These are actual textbook physics equations for perfectly elastic collision.
-					obj.dx = (v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.cos(cAngle + Math.PI / 2);
-					obj.dy = (v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.sin(cAngle + Math.PI / 2);
-					objects[i].dx = (v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.cos(cAngle + Math.PI / 2);
-					objects[i].dy = (v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.sin(cAngle + Math.PI / 2);
-
+					obj.vel = {
+						dx:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.cos(cAngle + Math.PI / 2),
+						dy:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.sin(cAngle + Math.PI / 2),
+					}
+					objects[i].vel = {
+						dx:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.cos(cAngle + Math.PI / 2),
+						dy:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.sin(cAngle + Math.PI / 2),
+					}
+					
 					// Prevents nastiness.
-					var targetX = obj.x + Math.cos(cAngle) * minDist;
-					var targetY = obj.y + Math.sin(cAngle) * minDist;
-					var ax = (targetX - objects[i].x);
-					var ay = (targetY - objects[i].y);
+					var targetX = obj.pos.x + Math.cos(cAngle) * minDist;
+					var targetY = obj.pos.y + Math.sin(cAngle) * minDist;
+					var ax = (targetX - objects[i].pos.x);
+					var ay = (targetY - objects[i].pos.y);
 
 					// These are quasiphysics. Vestigial code left behind from a bygone era.
 					// obj.dx -= ax;
@@ -323,16 +331,16 @@ function phys(obj, dt) {
 					// objects[i].dx += ax;
 					// objects[i].dy += ay;
 
-					obj.x -= ax;
-					obj.y -= ay;
+					obj.pos.x -= ax;
+					obj.pos.y -= ay;
 					//objects[i].x += ax;
 					//objects[i].y += ay;
 
 					// add a bit of "padding" to the collision, thereby making it not perfectly elastic
-					obj.dx *= 0.9;
-					obj.dy *= 0.9;
-					objects[i].dx *= 0.9;
-					objects[i].dy *= 0.9;
+					obj.vel.dx *= 0.9;
+					obj.vel.dy *= 0.9;
+					objects[i].vel.dx *= 0.9;
+					objects[i].vel.dy *= 0.9;
 				}
 			}
 
@@ -342,27 +350,27 @@ function phys(obj, dt) {
 		}
 
 		//Check if Out of Bounds
-		if (obj.y + obj.r > h) {
-			obj.y = h - obj.r;
+		if (obj.pos.y + obj.r > h) {
+			obj.pos.y = h - obj.r;
 		}
-		if (obj.y - obj.r < 0) {
-			obj.y = 0 + obj.r;
+		if (obj.pos.y - obj.r < 0) {
+			obj.pos.y = 0 + obj.r;
 		}
-		if (obj.x + obj.r > w) {
-			obj.x = w - obj.r;
+		if (obj.pos.x + obj.r > w) {
+			obj.pos.x = w - obj.r;
 		}
-		if (obj.x - obj.r < 0) {
-			obj.x = 0 + obj.r;
+		if (obj.pos.x - obj.r < 0) {
+			obj.pos.x = 0 + obj.r;
 		}
 
 		//Bounding Box Constraints and wall friction
-		if (obj.y + obj.dy * dt + obj.r > h || obj.y + obj.dy * dt - obj.r < 0) {
-			obj.dy = -obj.dy * 0.75;
-			obj.dx = obj.dx * 0.99;
+		if (obj.pos.y + obj.vel.dy * dt + obj.r > h || obj.pos.y + obj.vel.dy * dt - obj.r < 0) {
+			obj.vel.dy = -obj.vel.dy * 0.75;
+			obj.vel.dx = obj.vel.dx * 0.99;
 		}
-		if (obj.x + obj.dx * dt + obj.r > w || obj.x + obj.dx * dt - obj.r < 0) {
-			obj.dx = -obj.dx * 0.75;
-			obj.dy = obj.dy * 0.99;
+		if (obj.pos.x + obj.vel.dx * dt + obj.r > w || obj.pos.x + obj.vel.dx * dt - obj.r < 0) {
+			obj.vel.dx = -obj.vel.dx * 0.75;
+			obj.vel.dy = obj.vel.dy * 0.99;
 		}
 	}
 }
@@ -395,11 +403,15 @@ var shapes = {
 		this.type = 'circle';
 		this.color = getRandomColor();
 		this.id = ids;
-		this.x = 100;
-		this.y = 100;
+		this.pos = {
+			x:100,
+			y:100
+		}
 		this.r = 25;
-		this.dx = 0;
-		this.dy = 0;
+		this.vel = {
+			dx:0,
+			dy:0
+		}
 		this.density = 1; // 1 mass unit per pixelDepth by default
 
 		this.selected = false;
@@ -423,6 +435,7 @@ var shapes = {
 		this.color = getRandomColor();
 		this.thick = 2;
 		this.id = ids;
+		
 		this.point1 = {
 			x: 100,
 			y: 100
@@ -430,6 +443,11 @@ var shapes = {
 		this.point2 = {
 			x: 200,
 			y: 200
+		};
+		
+		this.pos = {
+			x:(this.point1.x+this.point2.x)/2,
+			y:(this.point1.y+this.point2.y)/2
 		};
 		
 		this.selected = false;
@@ -467,15 +485,17 @@ var auxTools = {
 		handles.toolHandle = setInterval(function() {
 			/* Proccessing */
 			if (!reverse) {
-				obj.x = input.Cursor.x;
-				obj.y = input.Cursor.y;
+				obj.pos.x = input.Cursor.x;
+				obj.pos.y = input.Cursor.y;
 			}
-			obj.dx = 0;
-			obj.dy = 0;
+			obj.vel = {
+				dx:0,
+				dy:0
+			}
 
 			/* Drawing */
-			draw.extraDraw.velocity = function() {
-				// Velocity Line
+			draw.extraDraw.vel = function() {
+				// vel Line
 				var ctx = canvas.ctx;
 				ctx.beginPath();
 				ctx.moveTo(tools.vars.basePos.x, tools.vars.basePos.y);
@@ -486,7 +506,7 @@ var auxTools = {
 				ctx.strokeStyle = 'black';
 				ctx.stroke();
 
-				// Colouring to match Final Velocity
+				// Colouring to match Final vel
 				var velocityColoring;
 				var shotDistance = lineDistance(input.Cursor, tools.vars.basePos);
 				if (shotDistance > 750) {
@@ -517,8 +537,8 @@ var auxTools = {
 	throwEnd: function(obj, reverse) {
 		obj.suspendPhysics = false;
 		tools.vars.finalPos = input.Cursor;
-		obj.dx = (reverse) ? (tools.vars.finalPos.x - tools.vars.basePos.x) / 5 : (tools.vars.basePos.x - tools.vars.finalPos.x) / 5;
-		obj.dy = (reverse) ? (tools.vars.finalPos.y - tools.vars.basePos.y) / 5 : (tools.vars.basePos.y - tools.vars.finalPos.y) / 5;
+		obj.vel.dx = (reverse) ? (tools.vars.finalPos.x - tools.vars.basePos.x) / 5 : (tools.vars.basePos.x - tools.vars.finalPos.x) / 5;
+		obj.vel.dy = (reverse) ? (tools.vars.finalPos.y - tools.vars.basePos.y) / 5 : (tools.vars.basePos.y - tools.vars.finalPos.y) / 5;
 		tools.vars.basePos = {};
 		tools.vars.finalPos = {};
 	}
@@ -538,8 +558,8 @@ var tools = {
 		name: 'tool_delete',
 		description: 'Delete',
 		worksOn:['circle','line'],
-		onStart: function(selectedObj) {
-			delete objects[selectedObj.id]
+		onStart: function(obj) {
+			delete objects[obj.id]
 		},
 		onEnd: function() {
 			// N/A
@@ -554,8 +574,10 @@ var tools = {
 				getNewId()
 				objects[ids] = new shapes.Circle({
 					color: uVars.shapeColor,
-					x: input.Cursor.x,
-					y: input.Cursor.y,
+					pos:{
+						x: input.Cursor.x,
+						y: input.Cursor.y
+					},
 					r: uVars.radius
 				});
 			}, 50);
@@ -574,8 +596,10 @@ var tools = {
 				getNewId()
 				objects[ids] = new shapes.Circle({
 					color: uVars.shapeColor,
-					x: input.Cursor.x,
-					y: input.Cursor.y,
+					pos:{
+						x: input.Cursor.x,
+						y: input.Cursor.y
+					},
 					r: uVars.radius
 				});
 				objects[ids].selected = true;
@@ -597,16 +621,16 @@ var tools = {
 		name: 'tool_slingshot',
 		description: 'Slingshot',
 		worksOn: ['circle'],
-		onStart: function(selectedObj) {
-			selectedObj.selected = true;
+		onStart: function(obj) {
+			obj.selected = true;
 			if (handles.toolHandle === null) { // Throw only once
-				auxTools.throwBegin(selectedObj, false);
+				auxTools.throwBegin(obj, false);
 			}
 		},
-		onEnd: function(selectedObj) {
+		onEnd: function(obj) {
 			if (handles.toolHandle !== null) { // Not to throw again
-				auxTools.throwEnd(selectedObj, false);
-				selectedObj.selected = false;
+				auxTools.throwEnd(obj, false);
+				obj.selected = false;
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
 			}
@@ -617,16 +641,16 @@ var tools = {
 		name: 'tool_reverse_slingshot',
 		description: 'Reverse Slingshot',
 		worksOn: ['circle'],
-		onStart: function(selectedObj) {
-			selectedObj.selected = true;
+		onStart: function(obj) {
+			obj.selected = true;
 			if (handles.toolHandle === null) { // Throw only once
-				auxTools.throwBegin(selectedObj, true);
+				auxTools.throwBegin(obj, true);
 			}
 		},
-		onEnd: function(selectedObj) {
+		onEnd: function(obj) {
 			if (handles.toolHandle !== null) { // Not to throw again
-				auxTools.throwEnd(selectedObj, true);
-				selectedObj.selected = false;
+				auxTools.throwEnd(obj, true);
+				obj.selected = false;
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
 			}
@@ -637,52 +661,54 @@ var tools = {
 		name: 'tool_move',
 		description: 'Move',
 		worksOn: ['circle','line'],
-		onStart: function(selectedObj) {
+		onStart: function(obj) {
 			if (handles.toolHandle === null) {
-				selectedObj.selected = true;
-				selectedObj.suspendPhysics = true;
+				obj.selected = true;
+				obj.suspendPhysics = true;
 				
-				if (selectedObj.type=='circle') {
+				if (obj.type=='circle') {
 					tools.vars.offCentrePos = {
-						x: input.Cursor.x - selectedObj.x,
-						y: input.Cursor.y - selectedObj.y
+						x: input.Cursor.x - obj.pos.x,
+						y: input.Cursor.y - obj.pos.y
 					}
 					
 					handles.toolHandle = setInterval(function() {
-						selectedObj.x = input.Cursor.x - tools.vars.offCentrePos.x;
-						selectedObj.y = input.Cursor.y - tools.vars.offCentrePos.y;
-						selectedObj.dx = 0;
-						selectedObj.dy = 0;
+						obj.pos= {
+							x:input.Cursor.x - tools.vars.offCentrePos.x,
+							y:input.Cursor.y - tools.vars.offCentrePos.y
+						};
+						obj.vel = {
+							dx:0,
+							dy:0
+						};
 					}, 10);
-				} else if (selectedObj.type=='line') {
-					var midpoint = {
-						x:(selectedObj.point1.x+selectedObj.point2.x)/2,
-						y:(selectedObj.point1.y+selectedObj.point2.y)/2
-					}
-					var midToX = (selectedObj.point1.x-selectedObj.point2.x)/2;
-					var midToY = (selectedObj.point1.y-selectedObj.point2.y)/2;
+				} else if (obj.type == 'line') {
+					obj.pos = centerOfLine(obj.point1, obj.point2)
+					
+					var midToX = (obj.point1.x-obj.point2.x)/2;
+					var midToY = (obj.point1.y-obj.point2.y)/2;
 					
 					tools.vars.offCentrePos = {
-						x: input.Cursor.x - midpoint.x,
-						y: input.Cursor.y - midpoint.y
+						x: input.Cursor.x - obj.pos.x,
+						y: input.Cursor.y - obj.pos.y
 					}
 					
 					handles.toolHandle = setInterval(function() {
-						midpoint.x = input.Cursor.x - tools.vars.offCentrePos.x;
-						midpoint.y = input.Cursor.y - tools.vars.offCentrePos.y;
+						obj.pos.x = input.Cursor.x - tools.vars.offCentrePos.x;
+						obj.pos.y = input.Cursor.y - tools.vars.offCentrePos.y;
 						
-						selectedObj.point1.x = input.Cursor.x - midToX;
-						selectedObj.point1.y = input.Cursor.y - midToY;
-						selectedObj.point2.x = input.Cursor.x + midToX;
-						selectedObj.point2.y = input.Cursor.y + midToY;
+						obj.point1.x = input.Cursor.x - midToX;
+						obj.point1.y = input.Cursor.y - midToY;
+						obj.point2.x = input.Cursor.x + midToX;
+						obj.point2.y = input.Cursor.y + midToY;
 					}, 10);
 				}
 			}
 		},
-		onEnd: function(selectedObj) {
+		onEnd: function(obj) {
 			if (handles.toolHandle !== null) {
-				selectedObj.selected = false;
-				selectedObj.suspendPhysics = false;
+				obj.selected = false;
+				obj.suspendPhysics = false;
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
 			}
@@ -693,13 +719,13 @@ var tools = {
 		name: 'tool_drag',
 		description: 'Drag',
 		worksOn: ['circle'],
-		onStart: function(selectedObj) {
+		onStart: function(obj) {
 			if (handles.toolHandle === null) {
-				selectedObj.selected = true;
+				obj.selected = true;
 
 				tools.vars.offCentrePos = {
-					x: input.Cursor.x - selectedObj.x,
-					y: input.Cursor.y - selectedObj.y
+					x: input.Cursor.x - obj.pos.x,
+					y: input.Cursor.y - obj.pos.y
 				};
 				handles.toolHandle = setInterval(function() {
 					/* Processing */
@@ -707,8 +733,8 @@ var tools = {
 						x: input.Cursor.x - tools.vars.offCentrePos.x,
 						y: input.Cursor.y - tools.vars.offCentrePos.y
 					};
-					selectedObj.dx = (tools.vars.finalPos.x - selectedObj.x) / 3;
-					selectedObj.dy = (tools.vars.finalPos.y - selectedObj.y) / 3;
+					obj.vel.dx = (tools.vars.finalPos.x - obj.pos.x) / 3;
+					obj.vel.dy = (tools.vars.finalPos.y - obj.pos.y) / 3;
 
 					/* Drawing */
 					draw.extraDraw.drag = function() {
@@ -717,16 +743,16 @@ var tools = {
 						ctx.beginPath();
 						ctx.moveTo(input.Cursor.x, input.Cursor.y);
 						ctx.lineWidth = 2;
-						ctx.lineTo(selectedObj.x + tools.vars.offCentrePos.x, selectedObj.y + tools.vars.offCentrePos.y);
+						ctx.lineTo(obj.pos.x + tools.vars.offCentrePos.x, obj.pos.y + tools.vars.offCentrePos.y);
 						ctx.strokeStyle = 'red';
 						ctx.stroke();
 					};
 				}, 1);
 			}
 		},
-		onEnd: function(selectedObj) {
+		onEnd: function(obj) {
 			if (handles.toolHandle !== null) {
-				selectedObj.selected = false;
+				obj.selected = false;
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
 			}
@@ -735,28 +761,32 @@ var tools = {
 	/////////////////////////////////////////////////////
 	tool_explode: {
 		name: 'tool_explode',
-		description: 'Explode',
+		description: 'Explode (ish)',
 		worksOn: ['circle'],
-		onStart: function(selectedObj) {
+		onStart: function(obj) {
 			for (var i = 2; i < randInt(7, 3); i++) {
 				getNewId()
 				objects[ids] = new shapes.Circle({
-					color: selectedObj.color,
-					x: selectedObj.x,
-					y: selectedObj.y,
-					r: randInt(selectedObj.r, 5),
-					dx: randInt(50, -50),
-					dy: randInt(50, -50)
+					color: obj.color,
+					pos:{
+						x: obj.pos.x,
+						y: obj.pos.y
+					},
+					r: randInt(obj.r, 5),
+					vel:{
+						dx: randInt(50, -50),
+						dy: randInt(50, -50)
+					}
 				});
 
-				objects[selectedObj.id] = new shapes.Circle({
-					color: selectedObj.color,
-					x: selectedObj.x - selectedObj.r / 2,
-					y: selectedObj.y,
-					r: selectedObj.r / 2,
-					id: selectedObj.id,
-					dx: -10
-				});
+				// objects[obj.id] = new shapes.Circle({
+					// color: obj.color,
+					// x: obj.x - obj.r / 2,
+					// y: obj.y,
+					// r: obj.r / 2,
+					// id: obj.id,
+					// dx: -10
+				// });
 			}
 		},
 		onEnd: function() {
@@ -795,23 +825,31 @@ var tools = {
 	tool_info_panel: {
 		name: 'tool_info_panel',
 		description: 'Info Panel',
-		onStart: function(selectedObj) {
+		worksOn:['line','circle'],
+		onStart: function(obj) {
 			if (handles.toolHandle === null) {
-				selectedObj.selected = true;
+				obj.selected = true;
 				handles.toolHandle = setInterval(function() {
 					draw.extraDraw.info = function() {
 						var line = 0;
-						for (var prop in selectedObj) {
-							draw.writeMessage(prop + ': ' + selectedObj[prop], input.Cursor.x + 10, input.Cursor.y + line);
-							line += 18;
+						for (var prop in obj) {
+							if ( typeof obj[prop] == 'object' ) {
+								for (var prop1 in obj[prop]) {
+									draw.writeMessage(prop + '.' + prop1 + ': ' + obj[prop][prop1], input.Cursor.x + 10, input.Cursor.y + line);
+									line += 18;
+								}
+							} else {
+								draw.writeMessage(prop + ': ' + obj[prop], input.Cursor.x + 10, input.Cursor.y + line);
+								line += 18;
+							}
 						}
 					};
 				}, 1000 / uVars.fps);
 			}
 		},
-		onEnd: function(selectedObj) {
+		onEnd: function(obj) {
 			if (handles.toolHandle !== null) {
-				selectedObj.selected = false;
+				obj.selected = false;
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
 			}
@@ -908,7 +946,7 @@ function checkClick(obj) {
 	if (obj.type == "circle") {
 		// Math SUUUCKS, Let's use built in functions! WOO!
 		canvas.ctx.beginPath();
-		canvas.ctx.arc(obj.x, obj.y, obj.r, 0, Math.PI * 2, false);
+		canvas.ctx.arc(obj.pos.x, obj.pos.y, obj.r, 0, Math.PI * 2, false);
 		canvas.ctx.closePath();
 		return (canvas.ctx.isPointInPath(input.Cursor.x, input.Cursor.y)) ? true : false;
 	} else if (obj.type == "line") {
@@ -938,6 +976,13 @@ function distanceFromLineSegment (point1, point2, testPoint) {
 		return distToLine;
 	}
 
+}
+
+function centerOfLine (point1, point2) {
+	return {
+		x:(point1.x+point2.x)/2,
+		y:(point1.y+point2.y)/2
+	};
 }
 
 // Track User Actions
