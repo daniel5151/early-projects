@@ -202,7 +202,7 @@ var draw = {
 			canvas.ctx.beginPath();
 			
 			canvas.ctx.lineWidth = obj.selected ? 3 : obj.thick;
-			if ( (distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick+5) && (tools.vars.currTool=='tool_move') ) {
+			if ( (distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick+5) && ((tools.vars.currTool=='tool_move') || (tools.vars.currTool=='tool_drag')) ) {
 				canvas.ctx.fillStyle = obj.color;
 				
 				canvas.ctx.beginPath();
@@ -608,17 +608,19 @@ var tools = {
 		name: 'tool_spawn',
 		description: 'Spawn Ball',
 		onStart: function() {
-			handles.toolHandle = setInterval(function() {
-				getNewId()
-				objects[ids] = new shapes.Circle({
-					color: uVars.shapeColor,
-					pos:{
-						x: input.Cursor.x,
-						y: input.Cursor.y
-					},
-					r: uVars.radius
-				});
-			}, 50);
+			if (handles.toolHandle === null) { // Throw only once
+				handles.toolHandle = setInterval(function() {
+					getNewId()
+					objects[ids] = new shapes.Circle({
+						color: uVars.shapeColor,
+						pos:{
+							x: input.Cursor.x,
+							y: input.Cursor.y
+						},
+						r: uVars.radius
+					});
+				}, 50);
+			}
 		},
 		onEnd: function() {
 			clearInterval(handles.toolHandle);
@@ -804,9 +806,10 @@ var tools = {
 	tool_drag: {
 		name: 'tool_drag',
 		description: 'Drag',
-		worksOn: ['circle'],
+		worksOn: ['circle', 'line'],
 		onStart: function(obj) {
-			if (handles.toolHandle === null) {
+			if (obj.type == 'line') { tools.tool_move.onStart(obj) }
+			else if (handles.toolHandle === null) {
 				obj.selected = true;
 
 				tools.vars.offCentrePos = {
@@ -850,6 +853,7 @@ var tools = {
 		description: 'Explode (ish)',
 		worksOn: ['circle'],
 		onStart: function(obj) {
+			delete objects[obj.id]
 			for (var i = 2; i < randInt(7, 3); i++) {
 				getNewId()
 				objects[ids] = new shapes.Circle({
@@ -858,10 +862,10 @@ var tools = {
 						x: obj.pos.x,
 						y: obj.pos.y
 					},
-					r: randInt(obj.r, 5),
+					r: randInt(obj.r/2, obj.r/2),
 					vel:{
-						dx: randInt(50, -50),
-						dy: randInt(50, -50)
+						dx: randInt(500, -500),
+						dy: randInt(500, -500)
 					}
 				});
 
