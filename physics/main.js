@@ -11,8 +11,8 @@ var uVars = {
 	gravity: {
 		strength: 5,
 		angle: 0.5 * Math.PI,
-		dx: 0,
-		dy: 5,
+		x: 0,
+		y: 5,
 	},
 
 	radius: 25,
@@ -63,8 +63,8 @@ window.onload = function() {
 			},
 			r: 25,
 			vel:{
-				dx: randInt(0,10),
-				dy: randInt(0,10)
+				x: randInt(0,10),
+				y: randInt(0,10)
 			},
 			id: 0
 		})
@@ -129,20 +129,20 @@ var draw = {
 		canvas.ctx.fillStyle = 'black';
 		canvas.ctx.fillText(message, x, y);
 	},
-	velocityLine: function(x, y, dx, dy) {
+	velocityLine: function(x, y, x, y) {
 		canvas.ctx.beginPath();
 		canvas.ctx.moveTo(x, y);
-		canvas.ctx.lineTo(x + dx, y + dy);
+		canvas.ctx.lineTo(x + x, y + y);
 
 		canvas.ctx.lineWidth = 4;
 		canvas.ctx.strokeStyle = 'black';
 		canvas.ctx.stroke();
 
 		canvas.ctx.lineWidth = 2;
-		canvas.ctx.strokeStyle = getColorByVelocity(dx, dy);
+		canvas.ctx.strokeStyle = getColorByVelocity(x, y);
 		canvas.ctx.stroke();
 
-		draw.circle(x + dx, y + dy, 5, 'black');
+		draw.circle(x + x, y + y, 5, 'black');
 	},
 
 	// Shapes
@@ -161,7 +161,7 @@ var draw = {
 				fillcolor = getColorByHeight(obj.pos.y);
 			}
 			else if (obj.colorByVelocity) {
-				fillcolor = getColorByVelocity(obj.vel.dx, obj.vel.dy);
+				fillcolor = getColorByVelocity(obj.vel.x, obj.vel.y);
 			}
 			else if (obj.colorByRainbow) {
 				fillcolor = getRandomColor();
@@ -195,7 +195,7 @@ var draw = {
 
 			// vel Lines
 			if (obj.showVelocityLines) {
-				draw.velocityLine(obj.pos.x, obj.pos.y, obj.vel.dx, obj.vel.dy);
+				draw.velocityLine(obj.pos.x, obj.pos.y, obj.vel.x, obj.vel.y);
 			}
 		},
 		line: function(obj) {
@@ -296,13 +296,33 @@ function phys(obj, dt) {
 
 	if (obj.type == "circle") {
 		// Gravity
-		obj.vel.dx += uVars.gravity.dx * dt;
-		obj.vel.dy += uVars.gravity.dy * dt;
+		obj.vel.x += uVars.gravity.x * dt;
+		obj.vel.y += uVars.gravity.y * dt;
+		
+		//Check if Out of Bounds
+		if (obj.pos.y + obj.r > h) {
+			obj.pos.y = h - obj.r;
+		}
+		if (obj.pos.y - obj.r < 0) {
+			obj.pos.y = 0 + obj.r;
+		}
+		if (obj.pos.x + obj.r > w) {
+			obj.pos.x = w - obj.r;
+		}
+		if (obj.pos.x - obj.r < 0) {
+			obj.pos.x = 0 + obj.r;
+		}
 
-		//Apply Motion
-		obj.pos.x += obj.vel.dx * dt;
-		obj.pos.y += obj.vel.dy * dt;
-
+		//Bounding Box Constraints and wall friction
+		if (obj.pos.y + obj.vel.y * dt + obj.r > h || obj.pos.y + obj.vel.y * dt - obj.r < 0) {
+			obj.vel.y = -obj.vel.y * 0.75;
+			obj.vel.x = obj.vel.x * 0.99;
+		}
+		if (obj.pos.x + obj.vel.x * dt + obj.r > w || obj.pos.x + obj.vel.x * dt - obj.r < 0) {
+			obj.vel.x = -obj.vel.x * 0.75;
+			obj.vel.y = obj.vel.y * 0.99;
+		}
+		
 		// Collision
 		for (var i in objects) {
 			//alias
@@ -319,12 +339,12 @@ function phys(obj, dt) {
 				var dist = Math.sqrt(distX * distX + distY * distY);
 				var minDist = obj2.r + obj.r;
 				if (dist < minDist) {
-					var v1 = Math.sqrt(Math.pow(obj.vel.dx, 2) + Math.pow(obj.vel.dy, 2));
-					var v2 = Math.sqrt(Math.pow(obj2.vel.dx, 2) + Math.pow(obj2.vel.dy, 2));
+					var v1 = Math.sqrt(Math.pow(obj.vel.x, 2) + Math.pow(obj.vel.y, 2));
+					var v2 = Math.sqrt(Math.pow(obj2.vel.x, 2) + Math.pow(obj2.vel.y, 2));
 
 					var cAngle = Math.atan2(distY, distX);
-					var vAngle1 = Math.atan2(obj.vel.dy, obj.vel.dx);
-					var vAngle2 = Math.atan2(obj2.vel.dy, obj2.vel.dx);
+					var vAngle1 = Math.atan2(obj.vel.y, obj.vel.x);
+					var vAngle2 = Math.atan2(obj2.vel.y, obj2.vel.x);
 
 					// console.log(cAngle/Math.PI)
 
@@ -334,12 +354,12 @@ function phys(obj, dt) {
 
 					// These are actual textbook physics equations for perfectly elastic collision.
 					obj.vel = {
-						dx:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.cos(cAngle + Math.PI / 2),
-						dy:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.sin(cAngle + Math.PI / 2),
+						x:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.cos(cAngle + Math.PI / 2),
+						y:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.sin(cAngle + Math.PI / 2),
 					}
 					obj2.vel = {
-						dx:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.cos(cAngle + Math.PI / 2),
-						dy:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.sin(cAngle + Math.PI / 2),
+						x:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.cos(cAngle + Math.PI / 2),
+						y:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.sin(cAngle + Math.PI / 2),
 					}
 					
 					// Prevents nastiness.
@@ -349,10 +369,10 @@ function phys(obj, dt) {
 					var ay = (targetY - obj2.pos.y);
 
 					// These are quasiphysics. Vestigial code left behind from a bygone era.
-					// obj.dx -= ax;
-					// obj.dy -= ay;
-					// obj2.dx += ax;
-					// obj2.dy += ay;
+					// obj.x -= ax;
+					// obj.y -= ay;
+					// obj2.x += ax;
+					// obj2.y += ay;
 
 					obj.pos.x -= ax;
 					obj.pos.y -= ay;
@@ -360,56 +380,56 @@ function phys(obj, dt) {
 					obj2.pos.y += ay*0.95;
 
 					// add a bit of "padding" to the collision, thereby making it not perfectly elastic
-					obj.vel.dx *= 0.9;
-					obj.vel.dy *= 0.9;
-					obj2.vel.dx *= 0.9;
-					obj2.vel.dy *= 0.9;
+					obj.vel.x *= 0.9;
+					obj.vel.y *= 0.9;
+					obj2.vel.x *= 0.9;
+					obj2.vel.y *= 0.9;
 				}
 			} else if (obj2.type === 'line') {
 				// Collision with a line
 				var dist = distanceFromLineSegment(obj2.point1, obj2.point2, obj.pos);
 				if ( dist < obj.r) {
-					// obj.pos.x -= obj.vel.dx*dt;
-					// obj.pos.y -= obj.vel.dy*dt;
-					
-					var v = Math.sqrt(Math.pow(obj.vel.dx, 2) + Math.pow(obj.vel.dy, 2));
-					var vAngle = Math.atan2(obj.vel.dy, obj.vel.dx);
+					var v = Math.sqrt(Math.pow(obj.vel.x, 2) + Math.pow(obj.vel.y, 2));
+					var vAngle = Math.atan2(obj.vel.y, obj.vel.x);
 					var lineAngle = Math.atan2((obj2.point2.y-obj2.point1.y),(obj2.point2.x-obj2.point1.x));
 					
+					var radX = Math.sin(lineAngle) * obj.r;
+					var radY = Math.cos(lineAngle) * obj.r;
+					var distX = Math.sin(lineAngle) * dist;
+					var distY = Math.cos(lineAngle) * dist;
+					
+					var tX = radX - distX;
+					var tY = radY - distY;
+					
+					obj.pos.x -= tX;
+					obj.pos.y -= tY;
+					
+					// WIP Code
+					// var rVelX = (obj.vel.x) * Math.cos(lineAngle) + (obj.vel.y) * Math.sin(lineAngle)
+					// var rVelY = (obj.vel.x) * Math.sin(lineAngle) + (obj.vel.y) * Math.cos(lineAngle)
+					
+					// rVelY=-rVelY
+					
+					// var fVelX = rVelX * Math.cos(-lineAngle) + rVelY * Math.sin(-lineAngle);
+					// var fVelY = rVelX * Math.sin(-lineAngle) + rVelY * Math.cos(-lineAngle);
+					
+					// obj.vel.x = fVelX;
+					// obj.vel.y = fVelY;
+					
 					if ((vAngle >= Math.PI/2 && vAngle <= Math.PI)||(vAngle >= 3*Math.PI/2 && vAngle <= 2*Math.PI)) {
-						obj.vel.dx = v*Math.cos(vAngle - 2 * (lineAngle))
-						obj.vel.dy = v*Math.sin(vAngle - 2 * (lineAngle))
+						obj.vel.x = v*Math.cos(vAngle - 2 * (lineAngle))
+						obj.vel.y = v*Math.sin(vAngle - 2 * (lineAngle))
 					} else {
-						obj.vel.dx = v*Math.cos(vAngle + 2 * (lineAngle))
-						obj.vel.dy = v*Math.sin(vAngle + 2 * (lineAngle))
+						obj.vel.x = v*Math.cos(vAngle + 2 * (lineAngle))
+						obj.vel.y = v*Math.sin(vAngle + 2 * (lineAngle))
 					}
 				}
 			}
 		}
-
-		//Check if Out of Bounds
-		if (obj.pos.y + obj.r > h) {
-			obj.pos.y = h - obj.r;
-		}
-		if (obj.pos.y - obj.r < 0) {
-			obj.pos.y = 0 + obj.r;
-		}
-		if (obj.pos.x + obj.r > w) {
-			obj.pos.x = w - obj.r;
-		}
-		if (obj.pos.x - obj.r < 0) {
-			obj.pos.x = 0 + obj.r;
-		}
-
-		//Bounding Box Constraints and wall friction
-		if (obj.pos.y + obj.vel.dy * dt + obj.r > h || obj.pos.y + obj.vel.dy * dt - obj.r < 0) {
-			obj.vel.dy = -obj.vel.dy * 0.75;
-			obj.vel.dx = obj.vel.dx * 0.99;
-		}
-		if (obj.pos.x + obj.vel.dx * dt + obj.r > w || obj.pos.x + obj.vel.dx * dt - obj.r < 0) {
-			obj.vel.dx = -obj.vel.dx * 0.75;
-			obj.vel.dy = obj.vel.dy * 0.99;
-		}
+		
+		//Apply Motion
+		obj.pos.x += obj.vel.x * dt;
+		obj.pos.y += obj.vel.y * dt;
 	}
 }
 
@@ -447,8 +467,8 @@ var shapes = {
 		}
 		this.r = 25;
 		this.vel = {
-			dx:0,
-			dy:0
+			x:0,
+			y:0
 		}
 		this.density = 1; // 1 mass unit per pixelDepth by default
 
@@ -527,8 +547,8 @@ var auxTools = {
 				obj.pos.y = input.Cursor.y;
 			}
 			obj.vel = {
-				dx:0,
-				dy:0
+				x:0,
+				y:0
 			}
 
 			/* Drawing */
@@ -575,8 +595,8 @@ var auxTools = {
 	throwEnd: function(obj, reverse) {
 		obj.suspendPhysics = false;
 		tools.vars.finalPos = input.Cursor;
-		obj.vel.dx = (reverse) ? (tools.vars.finalPos.x - tools.vars.basePos.x) / 5 : (tools.vars.basePos.x - tools.vars.finalPos.x) / 5;
-		obj.vel.dy = (reverse) ? (tools.vars.finalPos.y - tools.vars.basePos.y) / 5 : (tools.vars.basePos.y - tools.vars.finalPos.y) / 5;
+		obj.vel.x = (reverse) ? (tools.vars.finalPos.x - tools.vars.basePos.x) / 5 : (tools.vars.basePos.x - tools.vars.finalPos.x) / 5;
+		obj.vel.y = (reverse) ? (tools.vars.finalPos.y - tools.vars.basePos.y) / 5 : (tools.vars.basePos.y - tools.vars.finalPos.y) / 5;
 		tools.vars.basePos = {};
 		tools.vars.finalPos = {};
 	}
@@ -751,8 +771,8 @@ var tools = {
 							y:input.Cursor.y - tools.vars.offCentrePos.y
 						};
 						obj.vel = {
-							dx:0,
-							dy:0
+							x:0,
+							y:0
 						};
 					}, 10);
 				} else if (obj.type === 'line') {
@@ -822,8 +842,8 @@ var tools = {
 						x: input.Cursor.x - tools.vars.offCentrePos.x,
 						y: input.Cursor.y - tools.vars.offCentrePos.y
 					};
-					obj.vel.dx = (tools.vars.finalPos.x - obj.pos.x) / 3;
-					obj.vel.dy = (tools.vars.finalPos.y - obj.pos.y) / 3;
+					obj.vel.x = (tools.vars.finalPos.x - obj.pos.x) / 3;
+					obj.vel.y = (tools.vars.finalPos.y - obj.pos.y) / 3;
 
 					/* Drawing */
 					draw.extraDraw.drag = function() {
@@ -854,7 +874,7 @@ var tools = {
 		worksOn: ['circle'],
 		onStart: function(obj) {
 			delete objects[obj.id]
-			for (var i = 2; i < randInt(7, 3); i++) {
+			for (var i = 0; i < randInt(7, 2); i++) {
 				getNewId()
 				objects[ids] = new shapes.Circle({
 					color: obj.color,
@@ -864,8 +884,8 @@ var tools = {
 					},
 					r: randInt(obj.r/2, obj.r/2),
 					vel:{
-						dx: randInt(500, -500),
-						dy: randInt(500, -500)
+						x: randInt(500, -500),
+						y: randInt(500, -500)
 					}
 				});
 
@@ -875,7 +895,7 @@ var tools = {
 					// y: obj.y,
 					// r: obj.r / 2,
 					// id: obj.id,
-					// dx: -10
+					// x: -10
 				// });
 			}
 		},
@@ -1215,17 +1235,17 @@ function updateVars() {
 		var sensitivity = 10;
 
 		if (window.innerHeight > window.innerWidth) {
-			uVars.gravity.dx = -(input.Accelerometer.ax - input.Accelerometer.cx) / sensitivity;
-			uVars.gravity.dy = (input.Accelerometer.ay - input.Accelerometer.cy) / sensitivity;
+			uVars.gravity.x = -(input.Accelerometer.ax - input.Accelerometer.cx) / sensitivity;
+			uVars.gravity.y = (input.Accelerometer.ay - input.Accelerometer.cy) / sensitivity;
 		} else {
-			uVars.gravity.dx = (input.Accelerometer.ay - input.Accelerometer.cy) / sensitivity;
-			uVars.gravity.dy = (input.Accelerometer.ax - input.Accelerometer.cx) / sensitivity;
+			uVars.gravity.x = (input.Accelerometer.ay - input.Accelerometer.cy) / sensitivity;
+			uVars.gravity.y = (input.Accelerometer.ax - input.Accelerometer.cx) / sensitivity;
 		}
 	} else {
 		uVars.gravity.angle = $("#gravAngleSlide").val() * Math.PI;
 		uVars.gravity.strength = $("#gravSlide").val();
-		uVars.gravity.dx = Math.cos(uVars.gravity.angle) * uVars.gravity.strength;
-		uVars.gravity.dy = Math.sin(uVars.gravity.angle) * uVars.gravity.strength;
+		uVars.gravity.x = Math.cos(uVars.gravity.angle) * uVars.gravity.strength;
+		uVars.gravity.y = Math.sin(uVars.gravity.angle) * uVars.gravity.strength;
 
 		accelPrompt = true;
 	}
@@ -1306,10 +1326,10 @@ getColorByHeight = function(y) {
 	}
 	return heightColoring;
 };
-getColorByVelocity = function(dx, dy) {
+getColorByVelocity = function(x, y) {
 	/* Color by Height */
 	var velocityColoring;
-	var tempVelocity = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+	var tempVelocity = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 	if (tempVelocity > 200) {
 		velocityColoring = 'rgb(255,0,0)';
 	} else if (tempVelocity > 100) {
