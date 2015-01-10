@@ -62,7 +62,7 @@ window.onload = function() {
 				y: 100,
 			},
 			r: 25,
-			vel:{
+			v:{
 				x: randInt(0,10),
 				y: randInt(0,10)
 			},
@@ -161,7 +161,7 @@ var draw = {
 				fillcolor = getColorByHeight(obj.pos.y);
 			}
 			else if (obj.colorByVelocity) {
-				fillcolor = getColorByVelocity(obj.vel.x, obj.vel.y);
+				fillcolor = getColorByVelocity(obj.v.x, obj.v.y);
 			}
 			else if (obj.colorByRainbow) {
 				fillcolor = getRandomColor();
@@ -193,9 +193,9 @@ var draw = {
 				draw.circle(obj.pos.x + obj.r / 2, obj.pos.y - obj.r / 4, obj.r / 8 / 3, 'black');
 			}
 
-			// vel Lines
+			// v Lines
 			if (obj.showVelocityLines) {
-				draw.velocityLine(obj.pos.x, obj.pos.y, obj.vel.x, obj.vel.y);
+				draw.velocityLine(obj.pos.x, obj.pos.y, obj.v.x, obj.v.y);
 			}
 		},
 		line: function(obj) {
@@ -296,8 +296,8 @@ function phys(obj, dt) {
 
 	if (obj.type == "circle") {
 		// Gravity
-		obj.vel.x += uVars.gravity.x * dt;
-		obj.vel.y += uVars.gravity.y * dt;
+		obj.v.x += uVars.gravity.x * dt;
+		obj.v.y += uVars.gravity.y * dt;
 		
 		//Check if Out of Bounds
 		if (obj.pos.y + obj.r > h) {
@@ -311,16 +311,6 @@ function phys(obj, dt) {
 		}
 		if (obj.pos.x - obj.r < 0) {
 			obj.pos.x = 0 + obj.r;
-		}
-
-		//Bounding Box Constraints and wall friction
-		if (obj.pos.y + obj.vel.y * dt + obj.r > h || obj.pos.y + obj.vel.y * dt - obj.r < 0) {
-			obj.vel.y = -obj.vel.y * 0.75;
-			obj.vel.x = obj.vel.x * 0.99;
-		}
-		if (obj.pos.x + obj.vel.x * dt + obj.r > w || obj.pos.x + obj.vel.x * dt - obj.r < 0) {
-			obj.vel.x = -obj.vel.x * 0.75;
-			obj.vel.y = obj.vel.y * 0.99;
 		}
 		
 		// Collision
@@ -339,12 +329,12 @@ function phys(obj, dt) {
 				var dist = Math.sqrt(distX * distX + distY * distY);
 				var minDist = obj2.r + obj.r;
 				if (dist < minDist) {
-					var v1 = Math.sqrt(Math.pow(obj.vel.x, 2) + Math.pow(obj.vel.y, 2));
-					var v2 = Math.sqrt(Math.pow(obj2.vel.x, 2) + Math.pow(obj2.vel.y, 2));
+					var v1 = Math.sqrt(Math.pow(obj.v.x, 2) + Math.pow(obj.v.y, 2));
+					var v2 = Math.sqrt(Math.pow(obj2.v.x, 2) + Math.pow(obj2.v.y, 2));
 
 					var cAngle = Math.atan2(distY, distX);
-					var vAngle1 = Math.atan2(obj.vel.y, obj.vel.x);
-					var vAngle2 = Math.atan2(obj2.vel.y, obj2.vel.x);
+					var vAngle1 = Math.atan2(obj.v.y, obj.v.x);
+					var vAngle2 = Math.atan2(obj2.v.y, obj2.v.x);
 
 					// console.log(cAngle/Math.PI)
 
@@ -353,44 +343,38 @@ function phys(obj, dt) {
 					var m2 = obj2.mass;
 
 					// These are actual textbook physics equations for perfectly elastic collision.
-					obj.vel = {
+					obj.v = {
 						x:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.cos(cAngle + Math.PI / 2),
 						y:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.sin(cAngle + Math.PI / 2),
 					}
-					obj2.vel = {
+					obj2.v = {
 						x:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.cos(cAngle + Math.PI / 2),
 						y:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.sin(cAngle + Math.PI / 2),
 					}
 					
-					// Prevents nastiness.
+					// Prevents nastiness. Or makes nastiness. Depends if you're an optimist.
 					var targetX = obj.pos.x + Math.cos(cAngle) * minDist;
 					var targetY = obj.pos.y + Math.sin(cAngle) * minDist;
 					var ax = (targetX - obj2.pos.x);
 					var ay = (targetY - obj2.pos.y);
-
-					// These are quasiphysics. Vestigial code left behind from a bygone era.
-					// obj.x -= ax;
-					// obj.y -= ay;
-					// obj2.x += ax;
-					// obj2.y += ay;
-
+					
 					obj.pos.x -= ax;
 					obj.pos.y -= ay;
-					obj2.pos.x += ax*0.95;
-					obj2.pos.y += ay*0.95;
+					// obj2.pos.x += ax;
+					// obj2.pos.y += ay;
 
 					// add a bit of "padding" to the collision, thereby making it not perfectly elastic
-					obj.vel.x *= 0.9;
-					obj.vel.y *= 0.9;
-					obj2.vel.x *= 0.9;
-					obj2.vel.y *= 0.9;
+					obj.v.x *= 0.9;
+					obj.v.y *= 0.9;
+					obj2.v.x *= 0.9;
+					obj2.v.y *= 0.9;
 				}
 			} else if (obj2.type === 'line') {
 				// Collision with a line
 				var dist = distanceFromLineSegment(obj2.point1, obj2.point2, obj.pos);
 				if ( dist < obj.r) {
-					var v = Math.sqrt(Math.pow(obj.vel.x, 2) + Math.pow(obj.vel.y, 2));
-					var vAngle = Math.atan2(obj.vel.y, obj.vel.x);
+					var v = Math.sqrt(Math.pow(obj.v.x, 2) + Math.pow(obj.v.y, 2));
+					var vAngle = Math.atan2(obj.v.y, obj.v.x);
 					var lineAngle = Math.atan2((obj2.point2.y-obj2.point1.y),(obj2.point2.x-obj2.point1.x));
 					
 					var radX = Math.sin(lineAngle) * obj.r;
@@ -405,31 +389,43 @@ function phys(obj, dt) {
 					obj.pos.y -= tY;
 					
 					// WIP Code
-					// var rVelX = (obj.vel.x) * Math.cos(lineAngle) + (obj.vel.y) * Math.sin(lineAngle)
-					// var rVelY = (obj.vel.x) * Math.sin(lineAngle) + (obj.vel.y) * Math.cos(lineAngle)
+					// var rVelX = (obj.v.x) * Math.cos(lineAngle) + (obj.v.y) * Math.sin(lineAngle)
+					// var rVelY = (obj.v.x) * Math.sin(lineAngle) + (obj.v.y) * Math.cos(lineAngle)
 					
 					// rVelY=-rVelY
 					
 					// var fVelX = rVelX * Math.cos(-lineAngle) + rVelY * Math.sin(-lineAngle);
 					// var fVelY = rVelX * Math.sin(-lineAngle) + rVelY * Math.cos(-lineAngle);
 					
-					// obj.vel.x = fVelX;
-					// obj.vel.y = fVelY;
+					// obj.v.x = fVelX;
+					// obj.v.y = fVelY;
 					
 					if ((vAngle >= Math.PI/2 && vAngle <= Math.PI)||(vAngle >= 3*Math.PI/2 && vAngle <= 2*Math.PI)) {
-						obj.vel.x = v*Math.cos(vAngle - 2 * (lineAngle))
-						obj.vel.y = v*Math.sin(vAngle - 2 * (lineAngle))
+						obj.v.x = v*Math.cos(vAngle - 2 * (lineAngle))
+						obj.v.y = v*Math.sin(vAngle - 2 * (lineAngle))
 					} else {
-						obj.vel.x = v*Math.cos(vAngle + 2 * (lineAngle))
-						obj.vel.y = v*Math.sin(vAngle + 2 * (lineAngle))
+						obj.v.x = v*Math.cos(vAngle + 2 * (lineAngle))
+						obj.v.y = v*Math.sin(vAngle + 2 * (lineAngle))
 					}
 				}
 			}
 		}
-		
 		//Apply Motion
-		obj.pos.x += obj.vel.x * dt;
-		obj.pos.y += obj.vel.y * dt;
+		obj.pos.x += obj.v.x * dt;
+		obj.pos.y += obj.v.y * dt;
+		
+		// Bounding Box Constraints and wall friction
+		// To be replaced by lines, but god knows when I get that working
+		if (obj.pos.y + obj.v.y * dt + obj.r > h || obj.pos.y + obj.v.y * dt - obj.r < 0) {
+			obj.v.y = -obj.v.y * 0.75;
+			obj.v.x = obj.v.x * 0.99;
+		}
+		if (obj.pos.x + obj.v.x * dt + obj.r > w || obj.pos.x + obj.v.x * dt - obj.r < 0) {
+			obj.v.x = -obj.v.x * 0.75;
+			obj.v.y = obj.v.y * 0.99;
+		}
+		
+		
 	}
 }
 
@@ -466,7 +462,7 @@ var shapes = {
 			y:100
 		}
 		this.r = 25;
-		this.vel = {
+		this.v = {
 			x:0,
 			y:0
 		}
@@ -546,14 +542,14 @@ var auxTools = {
 				obj.pos.x = input.Cursor.x;
 				obj.pos.y = input.Cursor.y;
 			}
-			obj.vel = {
+			obj.v = {
 				x:0,
 				y:0
 			}
 
 			/* Drawing */
-			draw.extraDraw.vel = function() {
-				// vel Line
+			draw.extraDraw.v = function() {
+				// v Line
 				var ctx = canvas.ctx;
 				ctx.beginPath();
 				ctx.moveTo(tools.vars.basePos.x, tools.vars.basePos.y);
@@ -564,7 +560,7 @@ var auxTools = {
 				ctx.strokeStyle = 'black';
 				ctx.stroke();
 
-				// Colouring to match Final vel
+				// Colouring to match Final v
 				var velocityColoring;
 				var shotDistance = lineDistance(input.Cursor, tools.vars.basePos);
 				if (shotDistance > 750) {
@@ -595,8 +591,8 @@ var auxTools = {
 	throwEnd: function(obj, reverse) {
 		obj.suspendPhysics = false;
 		tools.vars.finalPos = input.Cursor;
-		obj.vel.x = (reverse) ? (tools.vars.finalPos.x - tools.vars.basePos.x) / 5 : (tools.vars.basePos.x - tools.vars.finalPos.x) / 5;
-		obj.vel.y = (reverse) ? (tools.vars.finalPos.y - tools.vars.basePos.y) / 5 : (tools.vars.basePos.y - tools.vars.finalPos.y) / 5;
+		obj.v.x = (reverse) ? (tools.vars.finalPos.x - tools.vars.basePos.x) / 5 : (tools.vars.basePos.x - tools.vars.finalPos.x) / 5;
+		obj.v.y = (reverse) ? (tools.vars.finalPos.y - tools.vars.basePos.y) / 5 : (tools.vars.basePos.y - tools.vars.finalPos.y) / 5;
 		tools.vars.basePos = {};
 		tools.vars.finalPos = {};
 	}
@@ -770,7 +766,7 @@ var tools = {
 							x:input.Cursor.x - tools.vars.offCentrePos.x,
 							y:input.Cursor.y - tools.vars.offCentrePos.y
 						};
-						obj.vel = {
+						obj.v = {
 							x:0,
 							y:0
 						};
@@ -842,8 +838,8 @@ var tools = {
 						x: input.Cursor.x - tools.vars.offCentrePos.x,
 						y: input.Cursor.y - tools.vars.offCentrePos.y
 					};
-					obj.vel.x = (tools.vars.finalPos.x - obj.pos.x) / 3;
-					obj.vel.y = (tools.vars.finalPos.y - obj.pos.y) / 3;
+					obj.v.x = (tools.vars.finalPos.x - obj.pos.x) / 3;
+					obj.v.y = (tools.vars.finalPos.y - obj.pos.y) / 3;
 
 					/* Drawing */
 					draw.extraDraw.drag = function() {
@@ -883,7 +879,7 @@ var tools = {
 						y: obj.pos.y
 					},
 					r: randInt(obj.r/2, obj.r/2),
-					vel:{
+					v:{
 						x: randInt(500, -500),
 						y: randInt(500, -500)
 					}
