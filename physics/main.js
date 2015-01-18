@@ -1,5 +1,5 @@
 // Declare global object container
-var objects = {};
+var objects = [];
 
 // Variables
 var uVars = {
@@ -52,24 +52,24 @@ window.onload = function() {
 
 	// Begin
 	console.log('Running...');
-	
+
 	// Initial ball
 	setTimeout(function() {
 		objects[0] = new shapes.Circle({
 			color: uVars.shapeColor,
-			pos:{
+			pos: {
 				x: 100,
 				y: 100,
 			},
 			r: 25,
-			v:{
-				x: randInt(0,10),
-				y: randInt(0,10)
+			v: {
+				x: randInt(0, 10),
+				y: randInt(0, 10)
 			},
 			id: 0
 		})
 	}, 10);
-	
+
 	main();
 };
 
@@ -131,66 +131,60 @@ var draw = {
 	},
 	arrow: function(x, y, x2, y2, color) {
 		var headlen = 10;
-		var angle = Math.atan2(y2-y,x2-x);
-		
+		var angle = Math.atan2(y2 - y, x2 - x);
+
 		canvas.ctx.beginPath();
-		
+
 		canvas.ctx.moveTo(x, y);
 		canvas.ctx.lineTo(x2, y2);
 		canvas.ctx.moveTo(x2, y2);
-		
-		canvas.ctx.lineTo(x2-headlen*Math.cos(angle-Math.PI/6),y2-headlen*Math.sin(angle-Math.PI/6));
+
+		canvas.ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
 		canvas.ctx.moveTo(x2, y2);
-		canvas.ctx.lineTo(x2-headlen*Math.cos(angle+Math.PI/6),y2-headlen*Math.sin(angle+Math.PI/6));
-		
+		canvas.ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+
 		canvas.ctx.lineWidth = 4;
 		canvas.ctx.strokeStyle = 'black';
 		canvas.ctx.stroke();
-		
+
 		canvas.ctx.lineWidth = 2;
 		canvas.ctx.strokeStyle = color;
 		canvas.ctx.stroke();
-		
+
 		canvas.ctx.closePath();
 	},
 	line: function(x, y, x2, y2, props) {
 		canvas.ctx.beginPath();
-		
+
 		canvas.ctx.lineWidth = props.width || 1;
-		canvas.ctx.strokeStyle = props.color || 'black' ;
-		
+		canvas.ctx.strokeStyle = props.color || 'black';
+
 		if (props.dashed) {
-			canvas.ctx.dashedLine(x,y,x2,y2, 3)
+			canvas.ctx.dashedLine(x, y, x2, y2, 3)
 		} else {
-			canvas.ctx.moveTo(x,y)
-			canvas.ctx.lineTo(x2,y2)
+			canvas.ctx.moveTo(x, y)
+			canvas.ctx.lineTo(x2, y2)
 		}
-		
+
 		canvas.ctx.stroke();
-		
+
 		canvas.ctx.closePath();
 	},
-	
+
 	// Shapes
 	shape: {
 		circle: function(obj) {
 			// self update
-
-			// obj.smiley=uVars.smiley;
-			// obj.colorByHeight=uVars.colorByHeight;
-			// obj.colorByVelocity=uVars.colorByVelocity;
 			obj.colorByRainbow = uVars.colorByRainbow;
-			obj.showVelocityLines = uVars.showVelocityLines;
 
 			var fillcolor;
-			if (obj.colorByHeight) {
+			if (obj.colorByRainbow) {
+				fillcolor = getRandomColor();
+			} else if (obj.colorByHeight) {
 				fillcolor = getColorByHeight(obj.pos.y);
 			}
 			else if (obj.colorByVelocity) {
 				fillcolor = getColorByVelocity(obj.v.x, obj.v.y);
-			}
-			else if (obj.colorByRainbow) {
-				fillcolor = getRandomColor();
 			}
 			else {
 				fillcolor = obj.color;
@@ -221,29 +215,29 @@ var draw = {
 
 			// v Lines
 			if (obj.showVelocityLines) {
-				draw.arrow(obj.pos.x, obj.pos.y, obj.pos.x+obj.v.x*1.5, obj.pos.y+obj.v.y*1.5, getColorByVelocity(obj.v.x, obj.v.y));
+				draw.arrow(obj.pos.x, obj.pos.y, obj.pos.x + obj.v.x * 1.5, obj.pos.y + obj.v.y * 1.5, getColorByVelocity(obj.v.x, obj.v.y));
 			}
 		},
 		line: function(obj) {
 			canvas.ctx.beginPath();
-			
+
 			canvas.ctx.lineWidth = obj.selected ? 3 : obj.thick;
-			if ( (distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick+5) && ((tools.vars.currTool=='tool_move') || (tools.vars.currTool=='tool_drag')) ) {
+			if ((distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick + 5) && ((tools.vars.currTool == 'tool_move') || (tools.vars.currTool == 'tool_drag'))) {
 				canvas.ctx.fillStyle = obj.color;
-				
+
 				canvas.ctx.beginPath();
 				canvas.ctx.arc(obj.point1.x, obj.point1.y, 5, 0, Math.PI * 2, false);
 				canvas.ctx.fill();
 				canvas.ctx.closePath();
-				
+
 				canvas.ctx.beginPath();
 				canvas.ctx.arc(obj.point2.x, obj.point2.y, 5, 0, Math.PI * 2, false);
 				canvas.ctx.fill();
 				canvas.ctx.closePath();
-				
+
 				canvas.ctx.lineWidth = 3
 			}
-			
+
 			canvas.ctx.beginPath();
 			canvas.ctx.strokeStyle = obj.color;
 			canvas.ctx.moveTo(obj.point1.x, obj.point1.y);
@@ -346,17 +340,19 @@ function phys(obj, dt) {
 		obj.v.y += uVars.gravity.y / 5;
 
 		// Collision
-		for (var i in objects) {
-			if (objects[i].id == obj.id) {
-				continue;
+		if (!uVars.noCollision) {
+			for (var i in objects) {
+				if (objects[i].id == obj.id) {
+					continue;
+				}
+				collision(obj, objects[i], dt)
 			}
-			collision(obj, objects[i], dt)
 		}
-		
+
 		//Apply Motion
 		obj.pos.x += obj.v.x * dt;
 		obj.pos.y += obj.v.y * dt;
-		
+
 		// Bounding Box Constraints and wall friction
 		// To be replaced by lines, but god knows when I get that working
 		if (obj.pos.y + obj.v.y * dt + obj.r > h || obj.pos.y + obj.v.y * dt - obj.r < 0) {
@@ -367,7 +363,7 @@ function phys(obj, dt) {
 			obj.v.x = -obj.v.x * 0.75;
 			obj.v.y = obj.v.y * 0.99;
 		}
-				
+
 		//Check if Out of Bounds
 		if (obj.pos.y + obj.r > h) {
 			obj.pos.y = h - obj.r;
@@ -384,13 +380,13 @@ function phys(obj, dt) {
 	}
 }
 
-function collision (obj, obj2, dt) {
+function collision(obj, obj2, dt) {
 	if (obj2.type === 'circle') {
 		//Collision with other balls
 		// var distX = obj2.pos.x - obj.pos.x;
 		// var distY = obj2.pos.y - obj.pos.y;
-		var distX = obj2.pos.x + obj2.v.x * dt - ( obj.pos.x + obj.v.x * dt )
-		var distY = obj2.pos.y + obj2.v.y * dt - ( obj.pos.y + obj.v.y * dt )
+		var distX = obj2.pos.x + obj2.v.x * dt - (obj.pos.x + obj.v.x * dt)
+		var distY = obj2.pos.y + obj2.v.y * dt - (obj.pos.y + obj.v.y * dt)
 		var dist = Math.sqrt(distX * distX + distY * distY);
 		var minDist = obj2.r + obj.r;
 		if (dist < minDist) {
@@ -409,20 +405,20 @@ function collision (obj, obj2, dt) {
 
 			// These are actual textbook physics equations for perfectly elastic collision.
 			obj.v = {
-				x:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.cos(cAngle + Math.PI / 2),
-				y:(v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.sin(cAngle + Math.PI / 2),
+				x: (v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.cos(cAngle + Math.PI / 2),
+				y: (v1 * Math.cos(vAngle1 - cAngle) * (m1 - m2) + 2 * m2 * v2 * Math.cos(vAngle2 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v1 * Math.sin(vAngle1 - cAngle) * Math.sin(cAngle + Math.PI / 2),
 			}
 			obj2.v = {
-				x:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.cos(cAngle + Math.PI / 2),
-				y:(v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.sin(cAngle + Math.PI / 2),
+				x: (v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.cos(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.cos(cAngle + Math.PI / 2),
+				y: (v2 * Math.cos(vAngle2 - cAngle) * (m2 - m1) + 2 * m1 * v1 * Math.cos(vAngle1 - cAngle)) / (m1 + m2) * Math.sin(cAngle) + v2 * Math.sin(vAngle2 - cAngle) * Math.sin(cAngle + Math.PI / 2),
 			}
-			
+
 			// Prevents nastiness. Or makes nastiness. Depends if you're an optimist.
 			var targetX = obj.pos.x + Math.cos(cAngle) * minDist;
 			var targetY = obj.pos.y + Math.sin(cAngle) * minDist;
 			var ax = (targetX - obj2.pos.x);
 			var ay = (targetY - obj2.pos.y);
-			
+
 			obj.pos.x -= ax;
 			obj.pos.y -= ay;
 			// obj2.pos.x += ax;
@@ -437,40 +433,40 @@ function collision (obj, obj2, dt) {
 	} else if (obj2.type === 'line') {
 		// Collision with a line
 		var dist = distanceFromLineSegment(obj2.point1, obj2.point2, obj.pos);
-		if ( dist < obj.r) {
+		if (dist < obj.r) {
 			var v = Math.sqrt(Math.pow(obj.v.x, 2) + Math.pow(obj.v.y, 2));
 			var vAngle = Math.atan2(obj.v.y, obj.v.x);
-			var lineAngle = Math.atan2((obj2.point2.y-obj2.point1.y),(obj2.point2.x-obj2.point1.x));
-			
+			var lineAngle = Math.atan2((obj2.point2.y - obj2.point1.y), (obj2.point2.x - obj2.point1.x));
+
 			var radX = Math.sin(lineAngle) * obj.r;
 			var radY = Math.cos(lineAngle) * obj.r;
 			var distX = Math.sin(lineAngle) * dist;
 			var distY = Math.cos(lineAngle) * dist;
-			
+
 			var tX = radX - distX;
 			var tY = radY - distY;
-			
+
 			obj.pos.x -= tX;
 			obj.pos.y -= tY;
-			
+
 			// WIP Code
 			// var rVelX = (obj.v.x) * Math.cos(lineAngle) + (obj.v.y) * Math.sin(lineAngle)
 			// var rVelY = (obj.v.x) * Math.sin(lineAngle) + (obj.v.y) * Math.cos(lineAngle)
-			
+
 			// rVelY=-rVelY
-			
+
 			// var fVelX = rVelX * Math.cos(-lineAngle) + rVelY * Math.sin(-lineAngle);
 			// var fVelY = rVelX * Math.sin(-lineAngle) + rVelY * Math.cos(-lineAngle);
-			
+
 			// obj.v.x = fVelX;
 			// obj.v.y = fVelY;
-			
-			if ((vAngle >= Math.PI/2 && vAngle <= Math.PI)||(vAngle >= 3*Math.PI/2 && vAngle <= 2*Math.PI)) {
-				obj.v.x = v*Math.cos(vAngle - 2 * (lineAngle))
-				obj.v.y = v*Math.sin(vAngle - 2 * (lineAngle))
+
+			if ((vAngle >= Math.PI / 2 && vAngle <= Math.PI) || (vAngle >= 3 * Math.PI / 2 && vAngle <= 2 * Math.PI)) {
+				obj.v.x = v * Math.cos(vAngle - 2 * (lineAngle))
+				obj.v.y = v * Math.sin(vAngle - 2 * (lineAngle))
 			} else {
-				obj.v.x = v*Math.cos(vAngle + 2 * (lineAngle))
-				obj.v.y = v*Math.sin(vAngle + 2 * (lineAngle))
+				obj.v.x = v * Math.cos(vAngle + 2 * (lineAngle))
+				obj.v.y = v * Math.sin(vAngle + 2 * (lineAngle))
 			}
 		}
 	}
@@ -484,18 +480,23 @@ var shapes = {
 		this.color = getRandomColor();
 		this.id = ids;
 		this.pos = {
-			x:100,
-			y:100
+			x: 100,
+			y: 100
 		}
 		this.r = 25;
 		this.v = {
-			x:0,
-			y:0
+			x: 0,
+			y: 0
 		}
 		this.density = 1; // 1 mass unit per pixelDepth by default
 
 		this.selected = false;
 		this.suspendPhysics = false;
+
+		this.smiley = uVars.smiley;
+		this.colorByHeight = uVars.colorByHeight;
+		this.colorByVelocity = uVars.colorByVelocity;
+		this.showVelocityLines = uVars.showVelocityLines;
 
 		// customs
 		for (var prop in props) {
@@ -503,11 +504,6 @@ var shapes = {
 		}
 
 		this.mass = Math.PI * Math.pow(this.r, 2) * this.density;
-
-		this.smiley = uVars.smiley;
-		this.colorByHeight = uVars.colorByHeight;
-		this.colorByVelocity = uVars.colorByVelocity;
-		this.showVelocityLines = uVars.showVelocityLines;
 	},
 	Line: function(props) {
 		// defaults
@@ -515,7 +511,7 @@ var shapes = {
 		this.color = getRandomColor();
 		this.thick = 2;
 		this.id = ids;
-		
+
 		this.point1 = {
 			x: 100,
 			y: 100
@@ -524,12 +520,12 @@ var shapes = {
 			x: 200,
 			y: 200
 		};
-		
+
 		this.pos = {
-			x:(this.point1.x+this.point2.x)/2,
-			y:(this.point1.y+this.point2.y)/2
+			x: (this.point1.x + this.point2.x) / 2,
+			y: (this.point1.y + this.point2.y) / 2
 		};
-		
+
 		this.selected = false;
 
 		// customs
@@ -568,29 +564,33 @@ var auxTools = {
 				obj.pos.x = input.Cursor.x;
 				obj.pos.y = input.Cursor.y;
 			}
-			
+
 			var vx = (reverse) ? (input.Cursor.x - tools.vars.basePos.x) / 5 : (tools.vars.basePos.x - input.Cursor.x) / 5;
 			var vy = (reverse) ? (input.Cursor.y - tools.vars.basePos.y) / 5 : (tools.vars.basePos.y - input.Cursor.y) / 5;
-			
+
 			/* Drawing */
 			draw.extraDraw.v = function() {
 				var x = tools.vars.basePos.x
 				var y = tools.vars.basePos.y
 				var x2 = input.Cursor.x
 				var y2 = input.Cursor.y
-				
+
 				if (!reverse) {
 					var temp = x;
 					x = x2;
 					x2 = temp;
-					
+
 					temp = y;
 					y = y2;
 					y2 = temp;
 				}
-				
-				draw.line(x, y, x2, y2, {color: 'grey', width: 1, dashed:true});
-				draw.arrow(x, y, obj.pos.x+vx*1.5, obj.pos.y+vy*1.5, getColorByVelocity(vx, vy));
+
+				draw.line(x, y, x2, y2, {
+					color: 'grey',
+					width: 1,
+					dashed: true
+				});
+				draw.arrow(x, y, obj.pos.x + vx * 1.5, obj.pos.y + vy * 1.5, getColorByVelocity(vx, vy));
 				draw.circle(x2, y2, 5, 'grey')
 			};
 		}, 1);
@@ -613,12 +613,12 @@ var tools = {
 		finalPos: {},
 		offCentrePos: {}
 	},
-	
+
 	/////////////////////////////////////////////////////
 	tool_delete: {
 		name: 'tool_delete',
 		description: 'Delete',
-		worksOn:['circle','line'],
+		worksOn: ['circle', 'line'],
 		onStart: function(obj) {
 			delete objects[obj.id]
 		},
@@ -636,7 +636,7 @@ var tools = {
 					getNewId()
 					objects[ids] = new shapes.Circle({
 						color: uVars.shapeColor,
-						pos:{
+						pos: {
 							x: input.Cursor.x,
 							y: input.Cursor.y
 						},
@@ -659,13 +659,14 @@ var tools = {
 				getNewId()
 				objects[ids] = new shapes.Circle({
 					color: uVars.shapeColor,
-					pos:{
+					pos: {
 						x: input.Cursor.x,
 						y: input.Cursor.y
 					},
-					r: uVars.radius
+					r: uVars.radius,
+					showVelocityLines: false,
+					selected: true
 				});
-				objects[ids].selected = true;
 				auxTools.throwBegin(objects[ids], false);
 			}
 		},
@@ -673,6 +674,7 @@ var tools = {
 			if (handles.toolHandle !== null) { // Not to throw again
 				auxTools.throwEnd(objects[ids], false);
 				objects[ids].selected = false;
+				objects[ids].showVelocityLines = uVars.showVelocityLines;
 
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
@@ -701,12 +703,12 @@ var tools = {
 		onEnd: function() {
 			if (handles.toolHandle !== null) { // Not to throw again
 				objects[ids].selected = false;
-				
-				if (lineDistance(objects[ids].point1, objects[ids].point2)<1) {
+
+				if (lineLength(objects[ids].point1, objects[ids].point2) < 1) {
 					delete objects[ids];
 					ids--;
 				}
-				
+
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
 			}
@@ -720,6 +722,7 @@ var tools = {
 		onStart: function(obj) {
 			obj.selected = true;
 			if (handles.toolHandle === null) { // Throw only once
+				obj.showVelocityLines = false;
 				auxTools.throwBegin(obj, false);
 			}
 		},
@@ -727,6 +730,7 @@ var tools = {
 			if (handles.toolHandle !== null) { // Not to throw again
 				auxTools.throwEnd(obj, false);
 				obj.selected = false;
+				obj.showVelocityLines = uVars.showVelocityLines;
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
 			}
@@ -740,6 +744,7 @@ var tools = {
 		onStart: function(obj) {
 			obj.selected = true;
 			if (handles.toolHandle === null) { // Throw only once
+				obj.showVelocityLines = false;
 				auxTools.throwBegin(obj, true);
 			}
 		},
@@ -747,6 +752,7 @@ var tools = {
 			if (handles.toolHandle !== null) { // Not to throw again
 				auxTools.throwEnd(obj, true);
 				obj.selected = false;
+				obj.showVelocityLines = uVars.showVelocityLines;
 				clearInterval(handles.toolHandle);
 				handles.toolHandle = null;
 			}
@@ -756,57 +762,57 @@ var tools = {
 	tool_move: {
 		name: 'tool_move',
 		description: 'Move',
-		worksOn: ['circle','line'],
+		worksOn: ['circle', 'line'],
 		onStart: function(obj) {
 			if (handles.toolHandle === null) {
 				obj.selected = true;
 				obj.suspendPhysics = true;
-				
+
 				if (obj.type === 'circle') {
 					tools.vars.offCentrePos = {
 						x: input.Cursor.x - obj.pos.x,
 						y: input.Cursor.y - obj.pos.y
 					}
-					
+
 					handles.toolHandle = setInterval(function() {
-						obj.pos= {
-							x:input.Cursor.x - tools.vars.offCentrePos.x,
-							y:input.Cursor.y - tools.vars.offCentrePos.y
+						obj.pos = {
+							x: input.Cursor.x - tools.vars.offCentrePos.x,
+							y: input.Cursor.y - tools.vars.offCentrePos.y
 						};
 						obj.v = {
-							x:0,
-							y:0
+							x: 0,
+							y: 0
 						};
 					}, 10);
 				} else if (obj.type === 'line') {
-					if (lineDistance(input.Cursor, obj.point1) < 5) {
+					if (lineLength(input.Cursor, obj.point1) < 5) {
 						handles.toolHandle = setInterval(function() {
 							obj.point1 = input.Cursor;
 						}, 10);
-					} else if (lineDistance(input.Cursor, obj.point2) < 5) {
+					} else if (lineLength(input.Cursor, obj.point2) < 5) {
 						handles.toolHandle = setInterval(function() {
 							obj.point2 = input.Cursor;
 						}, 10);
 					} else { // When the cursor is on the line, but not it's endpoints
 						obj.pos = centerOfLine(obj.point1, obj.point2)
-						
-						var midToX = (obj.point1.x-obj.point2.x)/2;
-						var midToY = (obj.point1.y-obj.point2.y)/2;
-						
+
+						var midToX = (obj.point1.x - obj.point2.x) / 2;
+						var midToY = (obj.point1.y - obj.point2.y) / 2;
+
 						tools.vars.offCentrePos = {
 							x: input.Cursor.x - obj.pos.x,
 							y: input.Cursor.y - obj.pos.y
 						}
-						
+
 						var grabToX1 = input.Cursor.x - obj.point1.x
 						var grabToY1 = input.Cursor.y - obj.point1.y
 						var grabToX2 = input.Cursor.x - obj.point2.x
 						var grabToY2 = input.Cursor.y - obj.point2.y
-						
+
 						handles.toolHandle = setInterval(function() {
 							obj.pos.x = input.Cursor.x - tools.vars.offCentrePos.x;
 							obj.pos.y = input.Cursor.y - tools.vars.offCentrePos.y;
-							
+
 							obj.point1.x = input.Cursor.x - grabToX1;
 							obj.point1.y = input.Cursor.y - grabToY1;
 							obj.point2.x = input.Cursor.x - grabToX2;
@@ -831,7 +837,9 @@ var tools = {
 		description: 'Drag',
 		worksOn: ['circle', 'line'],
 		onStart: function(obj) {
-			if (obj.type == 'line') { tools.tool_move.onStart(obj) }
+			if (obj.type == 'line') {
+				tools.tool_move.onStart(obj)
+			}
 			else if (handles.toolHandle === null) {
 				obj.selected = true;
 
@@ -881,24 +889,24 @@ var tools = {
 				getNewId()
 				objects[ids] = new shapes.Circle({
 					color: obj.color,
-					pos:{
+					pos: {
 						x: obj.pos.x,
 						y: obj.pos.y
 					},
-					r: randInt(obj.r/2, obj.r/2),
-					v:{
+					r: randInt(obj.r / 2, obj.r / 2),
+					v: {
 						x: randInt(500, -500),
 						y: randInt(500, -500)
 					}
 				});
 
 				// objects[obj.id] = new shapes.Circle({
-					// color: obj.color,
-					// x: obj.x - obj.r / 2,
-					// y: obj.y,
-					// r: obj.r / 2,
-					// id: obj.id,
-					// x: -10
+				// color: obj.color,
+				// x: obj.x - obj.r / 2,
+				// y: obj.y,
+				// r: obj.r / 2,
+				// id: obj.id,
+				// x: -10
 				// });
 			}
 		},
@@ -910,7 +918,7 @@ var tools = {
 	tool_info_panel: {
 		name: 'tool_info_panel',
 		description: 'Info Panel',
-		worksOn:['line','circle'],
+		worksOn: ['line', 'circle'],
 		onStart: function(obj) {
 			if (handles.toolHandle === null) {
 				obj.selected = true;
@@ -918,7 +926,7 @@ var tools = {
 					draw.extraDraw.info = function() {
 						var line = 0;
 						for (var prop in obj) {
-							if ( typeof obj[prop] == 'object' ) {
+							if (typeof obj[prop] == 'object') {
 								for (var prop1 in obj[prop]) {
 									draw.writeMessage(prop + '.' + prop1 + ': ' + obj[prop][prop1], input.Cursor.x + 10, input.Cursor.y + line);
 									line += 18;
@@ -1000,10 +1008,10 @@ function initEventHandlers() {
 var userInteract = {
 	onDown: function() {
 		this.selectedObj = whatObjClick();
-			if (tools[tools.vars.currTool].hasOwnProperty('worksOn')) {
+		if (tools[tools.vars.currTool].hasOwnProperty('worksOn')) {
 			if (this.selectedObj !== null) {
-				for (var i=0; i<tools[tools.vars.currTool].worksOn.length; i++) {
-					if (tools[tools.vars.currTool].worksOn[i]==this.selectedObj.type) {
+				for (var i = 0; i < tools[tools.vars.currTool].worksOn.length; i++) {
+					if (tools[tools.vars.currTool].worksOn[i] == this.selectedObj.type) {
 						tools[tools.vars.currTool].onStart(this.selectedObj);
 					}
 				}
@@ -1036,7 +1044,7 @@ function checkClick(obj) {
 		return (canvas.ctx.isPointInPath(input.Cursor.x, input.Cursor.y)) ? true : false;
 	} else if (obj.type == "line") {
 		// And then, unavoidable math. Yay.
-		if (distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick+5) { 
+		if (distanceFromLineSegment(obj.point1, obj.point2, input.Cursor) < obj.thick + 5) {
 			return true;
 		} else {
 			return false;
@@ -1189,6 +1197,8 @@ function updateVars() {
 		input.cursorType = 'default';
 	}
 
+	uVars.noCollision = ($('#noCollision').prop('checked'));
+
 	// Colouring
 	var randomColor = ($('#randomColor').prop('checked')) ? true : false;
 	uVars.shapeColor = (randomColor) ? getRandomColor() : $("#colorPicker").val();
@@ -1197,7 +1207,15 @@ function updateVars() {
 	uVars.colorByRainbow = ($('#colorByRainbow').prop('checked')) ? true : false;
 
 	uVars.smiley = ($('#smileyFace').prop('checked')) ? true : false;
-	uVars.showVelocityLines = ($('#showVelocityLines').prop('checked')) ? true : false;
+	var newShowVelocityLines = ($('#showVelocityLines').prop('checked')) ? true : false;
+	if (newShowVelocityLines != uVars.showVelocityLines) {
+		for (var key in objects) {
+			if (objects[key].type = 'circle') {
+				objects[key].showVelocityLines = (uVars.showVelocityLines) ? false : true;
+			}
+		}
+		uVars.showVelocityLines = newShowVelocityLines
+	}
 
 	var randomRadius = ($('#randomRadius').prop('checked')) ? true : false;
 	uVars.radius = (randomRadius) ? Math.floor(Math.random() * (50 - 5) + 5) : parseInt($("#radiusSlide").val(), 10);
@@ -1297,7 +1315,7 @@ function getRandomColor() {
 	return color;
 }
 
-function lineDistance(point1, point2) {
+function lineLength(point1, point2) {
 	var xs = 0;
 	var ys = 0;
 
@@ -1314,7 +1332,7 @@ function randInt(max, min) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-getColorByHeight = function(y) {
+function getColorByHeight(y) {
 	/* Color by Height */
 	var heightColoring;
 	var tempDistance;
@@ -1329,7 +1347,8 @@ getColorByHeight = function(y) {
 	}
 	return heightColoring;
 };
-getColorByVelocity = function(x, y) {
+
+function getColorByVelocity(x, y) {
 	/* Color by Height */
 	var velocityColoring;
 	var tempVelocity = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
@@ -1345,47 +1364,47 @@ getColorByVelocity = function(x, y) {
 	return velocityColoring;
 };
 
-function distanceFromLineSegment (point1, point2, testPoint) {
-	var lineLength = lineDistance(point1, point2)
-	var distStartPoint = lineDistance(testPoint, point1)
-	var distEndPoint = lineDistance(testPoint, point2)
-	
-	if (Math.pow(distEndPoint,2) > Math.pow(distStartPoint,2) + Math.pow(lineLength,2)) {
+function distanceFromLineSegment(point1, point2, testPoint) {
+	var lnLength = lineLength(point1, point2)
+	var distStartPoint = lineLength(testPoint, point1)
+	var distEndPoint = lineLength(testPoint, point2)
+
+	if (Math.pow(distEndPoint, 2) > Math.pow(distStartPoint, 2) + Math.pow(lnLength, 2)) {
 		return distStartPoint
-	} else if (Math.pow(distStartPoint,2) > Math.pow(distEndPoint,2) + Math.pow(lineLength,2)) {
+	} else if (Math.pow(distStartPoint, 2) > Math.pow(distEndPoint, 2) + Math.pow(lnLength, 2)) {
 		return distEndPoint
 	} else {
 		// Heron's formula to find "height" of triangle composed of line segment, and lines connecting
 		// each end point with the cursor.
-		var s = (distStartPoint+distEndPoint+lineLength)/2
-		var distToLine = 2/lineLength * Math.sqrt(s*(s-distStartPoint)*(s-distEndPoint)*(s-lineLength))
+		var s = (distStartPoint + distEndPoint + lnLength) / 2
+		var distToLine = 2 / lnLength * Math.sqrt(s * (s - distStartPoint) * (s - distEndPoint) * (s - lnLength))
 		return distToLine;
 	}
 }
 
-function centerOfLine (point1, point2) {
+function centerOfLine(point1, point2) {
 	return {
-		x:(point1.x+point2.x)/2,
-		y:(point1.y+point2.y)/2
+		x: (point1.x + point2.x) / 2,
+		y: (point1.y + point2.y) / 2
 	};
 }
 
-CanvasRenderingContext2D.prototype.dashedLine = function (x1, y1, x2, y2, dashLen) {
-    // There is a built in dashed line function, but this is for better support
+// There is a built in dashed line function, but this is for better support
+CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen) {
 	if (dashLen == undefined) dashLen = 2;
-    this.moveTo(x1, y1);
+	this.moveTo(x1, y1);
 
-    var dX = x2 - x1;
-    var dY = y2 - y1;
-    var dashes = Math.floor(Math.sqrt(dX * dX + dY * dY) / dashLen);
-    var dashX = dX / dashes;
-    var dashY = dY / dashes;
+	var dX = x2 - x1;
+	var dY = y2 - y1;
+	var dashes = Math.floor(Math.sqrt(dX * dX + dY * dY) / dashLen);
+	var dashX = dX / dashes;
+	var dashY = dY / dashes;
 
-    var q = 0;
-    while (q++ < dashes) {
-        x1 += dashX;
-        y1 += dashY;
-        this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x1, y1);
-    }
-    this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x2, y2);
+	var q = 0;
+	while (q++ < dashes) {
+		x1 += dashX;
+		y1 += dashY;
+		this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x1, y1);
+	}
+	this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x2, y2);
 };
