@@ -570,28 +570,30 @@ var auxTools = {
 
 			/* Drawing */
 			draw.extraDraw.v = function() {
-				var x = tools.vars.basePos.x
-				var y = tools.vars.basePos.y
-				var x2 = input.Cursor.x
-				var y2 = input.Cursor.y
+				if (uVars.showSlingshotVelocity) {
+					var x = tools.vars.basePos.x
+					var y = tools.vars.basePos.y
+					var x2 = input.Cursor.x
+					var y2 = input.Cursor.y
 
-				if (!reverse) {
-					var temp = x;
-					x = x2;
-					x2 = temp;
+					if (!reverse) {
+						var temp = x;
+						x = x2;
+						x2 = temp;
 
-					temp = y;
-					y = y2;
-					y2 = temp;
+						temp = y;
+						y = y2;
+						y2 = temp;
+					}
+
+					draw.line(x, y, x2, y2, {
+						color: 'grey',
+						width: 1,
+						dashed: true
+					});
+					draw.arrow(x, y, obj.pos.x + vx * 1.5, obj.pos.y + vy * 1.5, getColorByVelocity(vx, vy));
+					draw.circle(x2, y2, 5, 'grey')
 				}
-
-				draw.line(x, y, x2, y2, {
-					color: 'grey',
-					width: 1,
-					dashed: true
-				});
-				draw.arrow(x, y, obj.pos.x + vx * 1.5, obj.pos.y + vy * 1.5, getColorByVelocity(vx, vy));
-				draw.circle(x2, y2, 5, 'grey')
 			};
 		}, 1);
 	},
@@ -1216,7 +1218,9 @@ function updateVars() {
 		}
 		uVars.showVelocityLines = newShowVelocityLines
 	}
-
+	
+	uVars.showSlingshotVelocity = ($('#showSlingshotVelocity').prop('checked'));
+	
 	var randomRadius = ($('#randomRadius').prop('checked')) ? true : false;
 	uVars.radius = (randomRadius) ? Math.floor(Math.random() * (50 - 5) + 5) : parseInt($("#radiusSlide").val(), 10);
 
@@ -1408,3 +1412,11 @@ CanvasRenderingContext2D.prototype.dashedLine = function(x1, y1, x2, y2, dashLen
 	}
 	this[q % 2 == 0 ? 'moveTo' : 'lineTo'](x2, y2);
 };
+
+// (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+// (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+// m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+// })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+// ga('create', 'UA-58621690-1', 'auto');
+// ga('send', 'pageview');
