@@ -8,27 +8,16 @@ html {
 	color:#000000;
 }
 
-/*
-.button {
-	background-color:#ededed;
-	
-	border-radius:2px;
-	border:1px solid #dcdcdc;
-	
-	padding:0.5em;
-	color:#000000;
-	
-	max-width: 20em;
-	margin: 0 auto;
+#info {
+	padding-top: 1em;
+	text-align:center;
 }
 
-.button:hover {
-	background-color:#dfdfdf;
-}.button:active {
-	position:relative;
-	top:1px;
+#contact {
+	padding-top: 1em;
+	text-align:center;
 }
-*/
+
 
 .button {
 	background-color:#ededed;
@@ -39,7 +28,7 @@ html {
 	padding:0.5em;
 	color:#000000;
 	
-	max-width: 20em;
+	width:20em;
 	margin: 0em auto;
   
 	vertical-align: middle;
