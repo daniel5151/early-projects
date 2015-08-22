@@ -86,6 +86,9 @@ body {
 .card:hover {
     background: #acc9ff;
 }
+.card:focus {
+    background: #acc9ff;
+}
 
 .card .title {
     font-size: 32px;
@@ -149,6 +152,14 @@ body {
     align-items:center;
 }
 .card:hover p {
+    -webkit-transform: translateY(-100px);
+    -ms-transform: translateY(-100px);
+    transform: translateY(-100px);
+    
+    -webkit-transition-duration: 0.5s;
+    transition-duration: 0.5s;
+}
+.card:focus p {
     -webkit-transform: translateY(-100px);
     -ms-transform: translateY(-100px);
     transform: translateY(-100px);
