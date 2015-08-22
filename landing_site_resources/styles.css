@@ -1,0 +1,159 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,700);
+
+body {
+    font-family: 'Roboto', "Helvetica Neue", Arial, sans-serif;
+    text-align: center;
+    overflow-x: hidden;
+    margin: 0;
+    background: url("squared_metal.png");
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    margin: 0;
+}
+
+.container {
+	max-width: 1000px;
+    margin: auto;
+}
+
+@media only screen and (max-width : 1000px) {
+    .container {
+        width: 680px;
+    }
+}
+
+@media only screen and (max-width : 680px) {
+    .container {
+        width: 340px;
+    }
+}
+
+
+.container > div {
+	border-radius: 3px;
+    margin: 20px 0;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    background: #efefef;
+}
+
+.header {
+    padding: 20px 0;
+}
+.header h1, h2 {
+    padding-bottom: 5px;
+}
+
+.aboutme {
+    padding: 20px 10px;
+}
+.aboutme h3 {
+	margin-bottom: 10px;
+}
+
+.projects {
+	margin: auto;
+    padding: 20px 0;
+}
+.projects h1 {
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.contact {
+	padding: 20px 0;
+}
+
+.card {
+	width: 300px;
+    height: 448px;
+    display: inline-block;
+    margin: 10px;
+    vertical-align: top;
+    position: relative;
+    overflow: hidden;
+    background: #FFF;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    color: #272727;
+    border-radius: 2px;
+    
+    -webkit-transition: background 0.25s;
+    transition: background 0.25s;
+}
+.card:hover {
+    background: #acc9ff;
+}
+
+.card .title {
+    font-size: 32px;
+    width: 300px;
+    height: 75px;
+    margin: 20px auto;
+    padding: 10px;
+   
+    display:-webkit-box;
+    display:-webkit-flex;
+    display:-ms-flexbox;
+    display:flex;
+    
+    -webkit-box-pack:center;
+    -webkit-justify-content:center;
+    -ms-flex-pack:center;
+    justify-content:center;
+    
+    -webkit-box-align:center;
+    -webkit-align-items:center;
+    -ms-flex-align:center;
+    align-items:center;
+}
+.card .year {
+    height: 30px;
+    font-size: 15px;
+    line-height: 30px;
+    border-top: 2px #b9b9b9 solid;
+    background: #eaeaea;
+}
+.card img {
+    border-top: 2px #b9b9b9 solid;
+}
+
+.card p {
+    position: relative;
+    padding: 10px;
+    height: 100px;
+    background: #FFF;
+    border-radius: 2px;
+    margin: 0;
+    
+    border-top: 2px #b9b9b9 solid;
+    
+    -webkit-transition-duration: 0.5s;
+    transition-duration: 0.5s;
+    
+    display:-webkit-box;
+    display:-webkit-flex;
+    display:-ms-flexbox;
+    display:flex;
+    
+    -webkit-box-pack:center;
+    -webkit-justify-content:center;
+    -ms-flex-pack:center;
+    justify-content:center;
+    
+    -webkit-box-align:center;
+    -webkit-align-items:center;
+    -ms-flex-align:center;
+    align-items:center;
+}
+.card:hover p {
+    -webkit-transform: translateY(-100px);
+    -ms-transform: translateY(-100px);
+    transform: translateY(-100px);
+    
+    -webkit-transition-duration: 0.5s;
+    transition-duration: 0.5s;
+}
+

@@ -1,55 +1,103 @@
-<html>
-	<head>
-		<title>Daniel Prilik's Page</title>
-		<link rel="stylesheet" href="stylesheet.css" type="text/css"/>
-	</head>
+<html manifest="cache.appcache">
 
-	<body>
-		<div id='container'>
-			<div id="info">
-				<h1>Looks like you've found my website!</h1>
-				<h3>It's not much, but it's home.</h3>
-				
-				<div class="projects">
-					<p>Here are some of my larger projects:</p>
-					<a href='/physics/index.html'><div class="button">Basic Physics Thingy</div></a>
-					<a href='/Automa/index.html'><div class="button">Cellular Automa</div></a>
-					<a href='/conway/index.html'><div class="button">Conway's Game of Life</div></a>
-					<a href='/mp3/index.html'><div class="button">3D Music Analyzer (WebGL)</div></a>
-					<a href='/mp3_2d/index.html'><div class="button">2D Music Analyzer (Canvas)</div></a>
-				</div>
-				<div class="projects">
-					<p>And here are some smaller WIPs and tests:</p>
-					<a href='/particles/index.html'><div class="button">Particles</div></a>
-					<a href='/rain/index.html'><div class="button">Canvas Rain Demo</div></a>
-					<a href='/DNA/index.html'><div class="button">DNA [Hour Coding Challenge]</div></a>
-					<a href='/polyfact/index.html'><div class="button">Rational Roots / Factor Theorem Polynomial Factorer</div></a>
-				</div>
-			</div>
-			
-			<div id="contact">
-				<p>Enjoy!</p>
-				<p>Yours, <br><em>Daniel Prilik</em></p>
+<head>
+    <meta charset="utf-8">
+    
+    <meta name="viewport" content="width=device-width; initial-scale=1.0;">
+    
+    <!--Open Graph tags for facebook and such-->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Daniel Prilik" />
+    <meta property="og:site_name" content="I Code Things - Daniel Prilik" />
+    <meta property="og:url" content="http://prilik.ca/" />
+    <meta property="og:description" content="A collection of projects by Daniel Prilik, amongst other things" />
 
-				<p>Contact info:</p>
-				<p>
-					GitHub: <a href="https://github.com/daniel5151">daniel5151</a><br>
-					Email: <a href="mailto:daniel@prilik.ca">daniel@prilik.ca</a><br>
-				</p>
-				
-				<p>Hosted with Github.io</p>
-				
-				<p><a href="https://dl.dropboxusercontent.com/u/12136737/supersecrettesting/index.html">*My Rapid Prototyping Link*</a></p>
-			</div>
-		</div>
-	<script>
-		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    <title>I Code Things - Daniel Prilik</title>
+    
+    <link rel="stylesheet" href="landing_site_resources/styles.css">
+    <script src="landing_site_resources/main.js"></script>
+</head>
 
-		ga('create', 'UA-58621690-1', 'auto');
-		ga('send', 'pageview');
-	</script>
-	</body>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Looks like you found my website!</h1>
+            <h2>It's not much, but it's home.</h2>
+        </div>
+        <div class="aboutme">
+            <div class="text">
+                <h3>I'm Daniel Prilik, and, well, I code things.</h3>
+
+                <p>Below you'll find some of my larger and smaller projects.</p>
+                <p>Who knows, one day I might put up a blog...</p>
+            </div>
+        </div>
+        <div class="projects big-projects">
+            <h1>Big Projects</h1>
+            <div class="card">
+                <div class="title"><span>1212!</span></div>
+                <a href="prilik.ca/1212/"><img src="landing_site_resources/thumbs/1212.PNG"></a>
+                <div class="year">2015</div>
+                <p>1212! is a simple little puzzle game where you place pieces, make lines, and score points, all the while being careful not to run out of room.</p>
+            </div>
+            <div class="card">
+                <div class="title"><span>Basic Physics Thingy</span></div>
+                <a href="prilik.ca/physics/index.html"><img src="landing_site_resources/thumbs/phys.png"></a>
+                <div class="year">2013 +</div>
+                <p>This is a basic physics sandbox I've been developing since 11th grade. I've occasionally updated it as I've learned more complex physics.</p>
+            </div>
+            <div class="card">
+                <div class="title"><span>3D Music Analyzer (WebGL)</span></div>
+                <a href="prilik.ca/mp3/index.html"><img src="landing_site_resources/thumbs/mp3_3d.png"></a>
+                <div class="year">2014</div>
+                <p>Uses the WebAudio API and ThreeJS to visualize a audio stream in 3D realtime. Supports both local files and microphone input.</p>
+            </div>
+            <div class="card">
+                <div class="title"><span>2D Music Analyzer (Canvas)</span></div>
+                <a href="prilik.ca/mp3_2d/index.html"><img src="landing_site_resources/thumbs/mp3_2d.png"></a>
+                <div class="year">2014</div>
+                <p>Uses the WebAudio API and HTML5 Canvas to visualize a audio stream in 2D realtime. Supports both local files and microphone input.</p>
+            </div>
+            <div class="card">
+                <div class="title"><span>Cellular Automa</span></div>
+                <a href="prilik.ca/Automa/index.html"><img src="landing_site_resources/thumbs/automa.png"></a>
+                <div class="year">2013</div>
+                <p>A basic Cellular Automa generator I wrote as a school project.</p>
+            </div>
+            <div class="card">
+                <div class="title"><span>Conway's Game of Life</span></div>
+                <a href="prilik.ca/conway/index.html"><img src="landing_site_resources/thumbs/conway.png"></a>
+                <div class="year">2013</div>
+                <p>A basic implementation of Conway's Game of Life in HTML5 canvas I wrote for a school project.</p>
+            </div>
+        </div>
+        <div class="projects small-projects">
+            <h1>Smaller Projects and Demos</h1>
+            <div class="card">
+                <div class="title"><span>Particles</span></div>
+                <a href="prilik.ca/particles/index.html"><img src="landing_site_resources/thumbs/particles.png"></a>
+                <div class="year">2013</div>
+                <p>Spawn random particles on a Canvas to make a cool design. Mouse / Touch spawns new particles.</p>
+            </div>
+            <div class="card">
+                <div class="title"><span>Rain Demo</span></div>
+                <a href="prilik.ca/rain/index.html"><img src="landing_site_resources/thumbs/rain.png"></a>
+                <div class="year">2013</div>
+                <p>Simple little canvas rain demo.</p>
+            </div>
+            <div class="card">
+                <div class="title"><span>Polynomial Factorer</span></div>
+                <a href="prilik.ca/polyfact/index.html"><img src="landing_site_resources/thumbs/polyfact.png"></a>
+                <div class="year">2014</div>
+                <p>A simple calculator that uses the Rational Roots Theorum and Factor Theorum to factor polynomials. Only supports perfectly factorable polynomials though.</p>
+            </div>
+        </div>
+        <div class="contact">
+            <p>Email: <a href="mailto:daniel@prilik.ca">daniel@prilik.ca</a></p>
+            <p>GitHub: <a href="https://github.com/daniel5151">daniel5151</a></p>
+            <p>Hosted with Github Pages</p>
+        </div>
+    </div>
+</body>
+
 </html>
