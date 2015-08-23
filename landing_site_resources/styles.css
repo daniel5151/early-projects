@@ -6,6 +6,7 @@ body {
     overflow-x: hidden;
     margin: 0;
     background: url("squared_metal.png");
+    background-color: #c3c3c3;
 }
 
 * {
@@ -32,10 +33,17 @@ body {
     }
 }
 
-
 .container > div {
 	border-radius: 3px;
     margin: 20px 0;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    background: #efefef;
+}
+
+.container > h1 {
+    border-radius: 3px;
+    margin: 20px 0;
+    padding: 10px 0;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
     background: #efefef;
 }
@@ -57,10 +65,6 @@ body {
 .projects {
 	margin: auto;
     padding: 20px 0;
-}
-.projects h1 {
-    padding: 5px;
-    margin-bottom: 10px;
 }
 
 .contact {
@@ -84,10 +88,10 @@ body {
     transition: background 0.25s;
 }
 .card:hover {
-    background: #acc9ff;
+    background: #c4d9ff;
 }
 .card:focus {
-    background: #acc9ff;
+    background: #c4d9ff;
 }
 
 .card .title {
