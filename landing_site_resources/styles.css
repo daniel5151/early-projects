@@ -88,10 +88,10 @@ body {
     transition: background 0.25s;
 }
 .card:hover {
-    background: #c4d9ff;
+    background: #DDD;
 }
 .card:focus {
-    background: #c4d9ff;
+    background: #DDD;
 }
 
 .card .title {
