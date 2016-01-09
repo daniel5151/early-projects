@@ -22,15 +22,15 @@ body {
 }
 
 .container > div {
-	border-radius: 3px;
+	border-radius: 4px;
     margin: 20px 0;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
     background: #efefef;
 }
 
 .container > h1 {
-    border-radius: 3px;
-    margin: 20px 0;
+    border-radius: 4px;
+    margin: 20px auto;
     padding: 10px 0;
     box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
     background: #efefef;
@@ -53,6 +53,9 @@ body {
 .projects {
 	margin: auto;
     padding: 20px 0;
+}
+.projects > a {
+    text-decoration: none;
 }
 
 .contact {
@@ -120,11 +123,12 @@ body {
     position: relative;
     padding: 10px;
     height: 100px;
-    background: #FFF;
+    background: rgba(255,255,255,0.85);
     border-radius: 2px;
     margin: 0;
     
     border-top: 2px #b9b9b9 solid;
+    border-bottom: 2px #b9b9b9 solid;
     
     -webkit-transition-duration: 0.5s;
     transition-duration: 0.5s;
@@ -145,20 +149,79 @@ body {
     align-items:center;
 }
 .card:hover p {
-    -webkit-transform: translateY(-100px);
-    -ms-transform: translateY(-100px);
-    transform: translateY(-100px);
+    -webkit-transform: translateY(-128px);
+    -ms-transform: translateY(-128px);
+    transform: translateY(-128px);
     
     -webkit-transition-duration: 0.5s;
     transition-duration: 0.5s;
 }
 .card:focus p {
-    -webkit-transform: translateY(-100px);
-    -ms-transform: translateY(-100px);
-    transform: translateY(-100px);
+    -webkit-transform: translateY(-128px);
+    -ms-transform: translateY(-128px);
+    transform: translateY(-128px);
     
     -webkit-transition-duration: 0.5s;
     transition-duration: 0.5s;
+}
+
+/* Little Card */
+.small-card {
+    width: 300px;
+    height: 128px;
+    margin: 10px;
+    overflow: hidden;
+    
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    border-radius: 2px;
+}
+.small-card .img-container {
+    overflow: hidden;
+    width: 300;
+    height: 100;
+    border-top: 2px #b9b9b9 solid;
+}
+.small-card img {
+    border-top: 0px;
+    transform: translateY(-35%);
+}
+.small-card .title {
+    font-size: 16px;
+    width: 300px;
+    height: 24px;
+    margin: 2px auto;
+    padding: 0px;
+}
+
+.small-card p {
+    bottom:30px;
+}
+.small-card:hover p {
+    -webkit-transform: translateY(-100px);
+    -ms-transform: translateY(-100px);
+    transform: translateY(-100px);
+}
+.small-card:focus p {
+    -webkit-transform: translateY(-100px);
+    -ms-transform: translateY(-100px);
+    transform: translateY(-100px);
+}
+
+.small-card .year {
+    height: 30px;
+    width: 100px;
+
+    font-size: 15px;
+    line-height: 30px;
+
+    padding: 5px, 10px;
+
+    border-right: 1px #b9b9b9 solid;
+    border-top: 1px #b9b9b9 solid;
+    background: #eaeaea;
+
+    position: relative;
+    bottom: 30px;
 }
 
 /* Dat Responsive Design */
@@ -176,14 +239,14 @@ body {
     /* Little Card */
     .card {
         width: 300px;
-        height: 120px;
+        height: 128px;
         margin: 10px;
         overflow: hidden;
         
         box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
         border-radius: 2px;
     }
-    .img-container {
+    .card .img-container {
         overflow: hidden;
         width: 300;
         height: 100;
@@ -200,7 +263,35 @@ body {
         margin: 2px auto;
         padding: 0px;
     }
-    .card .year, .card p, .card:hover p, .card:focus p {
-        display: none;
+
+    .card p {
+        bottom:30px;
+    }
+    .card:hover p {
+        -webkit-transform: translateY(-100px);
+        -ms-transform: translateY(-100px);
+        transform: translateY(-100px);
+    }
+    .card:focus p {
+        -webkit-transform: translateY(-100px);
+        -ms-transform: translateY(-100px);
+        transform: translateY(-100px);
+    }
+
+    .card .year {
+        height: 30px;
+        width: 100px;
+
+        font-size: 15px;
+        line-height: 30px;
+
+        padding: 5px, 10px;
+
+        border-right: 1px #b9b9b9 solid;
+        border-top: 1px #b9b9b9 solid;
+        background: #eaeaea;
+
+        position: relative;
+        bottom: 30px;
     }
 }
