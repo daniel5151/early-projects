@@ -257,7 +257,9 @@ body {
         -moz-user-select: none;
         -ms-user-select: none;
         user-select: none;
-        
+
+        overflow: none;
+
         height: 30px;
         width: 30px;
         font-size: 24px;
