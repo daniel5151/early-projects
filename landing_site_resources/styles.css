@@ -108,6 +108,9 @@ body {
     -ms-flex-align:center;
     align-items:center;
 }
+
+
+
 .card .year {
     height: 30px;
     font-size: 15px;
@@ -118,8 +121,11 @@ body {
 .card img {
     border-top: 2px #b9b9b9 solid;
 }
-
-.card p {
+.card > a {
+    text-decoration: none;
+    color: black;
+}
+.card > p {
     position: relative;
     padding: 10px;
     height: 100px;
@@ -148,7 +154,7 @@ body {
     -ms-flex-align:center;
     align-items:center;
 }
-.card:hover p {
+.card:hover > p {
     -webkit-transform: translateY(-128px);
     -ms-transform: translateY(-128px);
     transform: translateY(-128px);
@@ -156,13 +162,17 @@ body {
     -webkit-transition-duration: 0.5s;
     transition-duration: 0.5s;
 }
-.card:focus p {
+.card:focus > p {
     -webkit-transform: translateY(-128px);
     -ms-transform: translateY(-128px);
     transform: translateY(-128px);
     
     -webkit-transition-duration: 0.5s;
     transition-duration: 0.5s;
+}
+
+.nfo {
+    display: none;
 }
 
 /* Little Card */
@@ -193,15 +203,15 @@ body {
     padding: 0px;
 }
 
-.small-card p {
+.small-card > p {
     bottom:30px;
 }
-.small-card:hover p {
+.small-card:hover > p {
     -webkit-transform: translateY(-100px);
     -ms-transform: translateY(-100px);
     transform: translateY(-100px);
 }
-.small-card:focus p {
+.small-card:focus > p {
     -webkit-transform: translateY(-100px);
     -ms-transform: translateY(-100px);
     transform: translateY(-100px);
@@ -236,6 +246,26 @@ body {
         width: 320px;
     }
 
+    /*Enable info button for mobile*/
+    /*Essentially useless on desktop though*/
+    .nfo {
+        display: block;
+
+        height: 30px;
+        width: 30px;
+        font-size: 24px;
+        background: rgba(255,255,255,0.85);
+        position: relative;
+        bottom: 258px;
+        left:270px;
+        border-bottom: 2px #b9b9b9 solid;
+        border-left: 2px #b9b9b9 solid;
+
+        text-align: center;
+        line-height: 30px;
+        z-index: 0;
+    }
+
     /* Little Card */
     .card {
         width: 300px;
@@ -264,15 +294,15 @@ body {
         padding: 0px;
     }
 
-    .card p {
+    .card > p {
         bottom:30px;
     }
-    .card:hover p {
+    .card:hover > p {
         -webkit-transform: translateY(-100px);
         -ms-transform: translateY(-100px);
         transform: translateY(-100px);
     }
-    .card:focus p {
+    .card:focus > p {
         -webkit-transform: translateY(-100px);
         -ms-transform: translateY(-100px);
         transform: translateY(-100px);
