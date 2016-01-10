@@ -46,8 +46,11 @@ body {
 .aboutme {
     padding: 20px 10px;
 }
-.aboutme h3 {
+.aboutme h1, h2, h3 {
 	margin-bottom: 10px;
+}
+.aboutme a {
+    text-decoration: none;
 }
 
 .projects {
