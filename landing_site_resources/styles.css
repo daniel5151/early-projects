@@ -36,6 +36,20 @@ body {
     background: #efefef;
 }
 
+a {
+    color: blue;
+}
+
+.text-content {
+    max-width: 680px;
+    width: 100%;
+    margin: auto;
+    display: inline-block;
+}
+.container .text-content {
+    margin: 10px 0;
+}
+
 .header {
     padding: 20px 0;
 }
@@ -53,17 +67,22 @@ body {
     text-decoration: none;
 }
 
+.resume {
+    padding: 20px 10px;
+}
+
 .projects {
 	margin: auto;
     padding: 20px 0;
-}
-.projects > a {
-    text-decoration: none;
 }
 
 .contact {
 	padding: 20px 0;
 }
+.contact a {
+    text-decoration: none;
+}
+
 
 /* Large Card */
 .card {
