@@ -40,34 +40,34 @@ function play(song) {
 }
 
 //load the mp3 file
-function getAudioSource() {
-	/* This deals with Drag and Drop Functionality */
-	var holder = document.getElementById('canvas')
-	
-	holder.ondragover = function () { this.className = 'hover'; return false; };
-	holder.ondragend = function () { this.className = ''; return false; };
-	
-	holder.ondrop = function (e) {
-		this.className = '';
-		e.preventDefault();
-		
-		var file = e.dataTransfer.files[0]
-		
-		loading()
-		
-		getSong(file);
-	}
-	
-	/* This deals with File Selection Functionality */
-	var fileInput = document.getElementById('fileInput');
-	fileInput.addEventListener('change', function(e) {
-		var file = fileInput.files[0];
-		
-		loading()
-		
-		getSong(file);
-    });
-}
+//function getAudioSource() {
+//	/* This deals with Drag and Drop Functionality */
+//	var holder = document.getElementById('canvas')
+//	
+//	holder.ondragover = function () { this.className = 'hover'; return false; };
+//	holder.ondragend = function () { this.className = ''; return false; };
+//	
+//	holder.ondrop = function (e) {
+//		this.className = '';
+//		e.preventDefault();
+//		
+//		var file = e.dataTransfer.files[0]
+//		
+//		loading()
+//		
+//		getSong(file);
+//	}
+//	
+//	/* This deals with File Selection Functionality */
+//	var fileInput = document.getElementById('fileInput');
+//	fileInput.addEventListener('change', function(e) {
+//		var file = fileInput.files[0];
+//		
+//		loading()
+//		
+//		getSong(file);
+//    });
+//}
 
 function getSong (file) {
 	reader = new FileReader();
@@ -189,11 +189,11 @@ function update() {
 function init() {
     console.log("Initializing SoundSystem");
     try {
-		audio.ctx = new webkitAudioContext(); //is there a better API for this?
+		audio.ctx = new AudioContext();
         setupCanvas('2d');
         audio.element = document.getElementById('audioNode');
         audio.song = new Song(audio.element, defaultSamples, true)
-        getAudioSource();
+        //getAudioSource();
         
         audio.element.onplay = function () {
             

@@ -38,35 +38,35 @@ function play(song) {
     setup = true;
 }
 
-//load the mp3 file
-function getAudioSource() {
-	/* This deals with Drag and Drop Functionality */
-	var holder = document.getElementById('canvas')
+//load the mp3 file - BROKEN
+// function getAudioSource() {
+// 	/* This deals with Drag and Drop Functionality */
+// 	var holder = document.getElementById('canvas')
 	
-	holder.ondragover = function () { this.className = 'hover'; return false; };
-	holder.ondragend = function () { this.className = ''; return false; };
+// 	holder.ondragover = function () { this.className = 'hover'; return false; };
+// 	holder.ondragend = function () { this.className = ''; return false; };
 	
-	holder.ondrop = function (e) {
-		this.className = '';
-		e.preventDefault();
+// 	holder.ondrop = function (e) {
+// 		this.className = '';
+// 		e.preventDefault();
 		
-		var file = e.dataTransfer.files[0]
+// 		var file = e.dataTransfer.files[0]
 		
-		loading()
+// 		loading()
 		
-		getSong(file);
-	}
+// 		getSong(file);
+// 	}
 	
-	/* This deals with File Selection Functionality */
-	var fileInput = document.getElementById('fileInput');
-	fileInput.addEventListener('change', function(e) {
-		var file = fileInput.files[0];
+// 	/* This deals with File Selection Functionality */
+// 	var fileInput = document.getElementById('fileInput');
+// 	fileInput.addEventListener('change', function(e) {
+// 		var file = fileInput.files[0];
 		
-		loading()
+// 		loading()
 		
-		getSong(file);
-    });
-}
+// 		getSong(file);
+//     });
+// }
 
 function getSong (file) {
 	reader = new FileReader();
@@ -218,11 +218,11 @@ function render3d () {
 function init() {
     console.log("Initializing SoundSystem");
     try {
-        audio.ctx = new webkitAudioContext(); //is there a better API for this?
+        audio.ctx = new AudioContext();
         setupCanvas();
         audio.element = document.getElementById('audioNode');
         audio.song = new Song(audio.element, defaultSamples, true)
-        getAudioSource();
+        // getAudioSource();
 		
 		audio.element.onplay = function () {
             
@@ -231,7 +231,7 @@ function init() {
             }
         }
     } catch(e) {
-        alert('Terribly sorry! You do not seem to have webAudio support! Try this demo in Chrome!');
+        alert("Terribly sorry, it looks like the demo's not working! Try this demo in Chrome!");
     }
 }
 
