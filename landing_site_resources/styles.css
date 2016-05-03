@@ -256,6 +256,30 @@ a {
     bottom: 30px;
 }
 
+#bulbimg {
+    animation-name: huerotate;
+    animation-duration: 5s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes huerotate {
+    0% {
+        -webkit-filter: blur(0px)  hue-rotate(0deg);
+            -ms-filter: blur(0px)  hue-rotate(0deg);
+                filter: blur(0px)  hue-rotate(0deg);
+    }
+    50% {
+        -webkit-filter: blur(0px)  hue-rotate(180deg);
+            -ms-filter: blur(0px)  hue-rotate(180deg);
+                filter: blur(0px)  hue-rotate(180deg);
+    }
+    100% {
+        -webkit-filter:  blur(0px) hue-rotate(360deg);
+            -ms-filter: blur(0px)  hue-rotate(360deg);
+                filter: blur(0px)  hue-rotate(360deg);
+    }
+}
+
 /* Dat Responsive Design */
 @media only screen and (max-width : 1000px) {
     .container {
@@ -275,10 +299,10 @@ a {
 
         -webkit-touch-callout: none;
         -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+         -khtml-user-select: none;
+           -moz-user-select: none;
+            -ms-user-select: none;
+                user-select: none;
 
         overflow: none;
 
