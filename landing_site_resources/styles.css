@@ -83,6 +83,29 @@ a {
     text-decoration: none;
 }
 
+/* Ribbons */
+
+.corner-ribbon{
+    width: 200px;
+    height: 30px;
+    background: #e82;
+
+    position: absolute;
+
+    top: 14px;
+    right: -70px;
+
+    text-align: center;
+    line-height: 30px;
+    letter-spacing: 1px;
+
+    color: #f0f0f0;
+
+    box-shadow: 0 0 5px rgba(0,0,0,.5);
+
+    -webkit-transform: rotate(45deg);
+            transform: rotate(45deg);
+}
 
 /* Large Card */
 .card {
@@ -378,5 +401,19 @@ a {
 
         position: relative;
         bottom: 30px;
+    }
+
+    .corner-ribbon{
+        width: 50px;
+        height: 28px;
+
+        top: 0px;
+        left: 0px;
+
+        box-shadow: 0 0 0px rgba(0,0,0,.5);
+        border-right: 2px #b9b9b9 solid;
+
+        -webkit-transform: rotate(0deg);
+                transform: rotate(0deg);
     }
 }
