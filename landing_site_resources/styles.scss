@@ -97,6 +97,12 @@ a {
     box-shadow: 0 0 5px rgba(0, 0, 0, .5);
 }
 
+.corner-ribbon--winner {
+    font-size: 14px;
+    letter-spacing: initial;
+    background-color: #43A047;
+}
+
 
 /* Large Card */
 
@@ -241,6 +247,9 @@ a {
         box-shadow: 0 0 0 rgba(0, 0, 0, .5);
 
         @include transform(rotate(0deg));
+    }
+    .corner-ribbon--winner {
+        width: 65px;
     }
 }
 

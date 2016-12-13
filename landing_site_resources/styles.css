@@ -54,6 +54,10 @@ a {
   color: #f0f0f0;
   background: #e82;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); }
+.corner-ribbon--winner {
+  font-size: 14px;
+  letter-spacing: initial;
+  background-color: #43A047; }
 
 /* Large Card */
 .card {
@@ -178,6 +182,8 @@ a {
     -ms-transform: rotate(0deg);
     -o-transform: rotate(0deg);
     transform: rotate(0deg); }
+  .small-card .corner-ribbon--winner {
+    width: 65px; }
 
 /* Dat Responsive Design */
 @media only screen and (max-width: 1000px) {
@@ -260,6 +266,8 @@ a {
       -ms-transform: rotate(0deg);
       -o-transform: rotate(0deg);
       transform: rotate(0deg); }
+    .card .corner-ribbon--winner {
+      width: 65px; }
     .card .title {
       width: 300px;
       margin: 2px 0; } }
