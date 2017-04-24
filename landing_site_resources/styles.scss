@@ -94,7 +94,8 @@ a {
   vertical-align: top;
   color: #272727;
   background: #fff;
-  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 5px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0px 2px 0 rgba(0,0,0,0.16), 0 0px 2px 0 rgba(0,0,0,0.12);
+  border-radius: 2px;
   @include transition(background 0.25s);
   &:focus, &:hover {
     background: #f6f6f5;
