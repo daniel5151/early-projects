@@ -9,7 +9,7 @@
     <meta property="og:site_name" content="I Code Things - Daniel Prilik">
     <meta property="og:url" content="http://prilik.com/">
     <meta property="og:description" content="Daniel Prilik, Software Engineer">
-    <title>Daniel Prilik - I Make Things!</title>
+    <title>Daniel Prilik - Software Engineer</title>
     <link rel="stylesheet" href="landing_site_resources/styles.css">
 </head>
 
@@ -19,11 +19,14 @@
     There isn't a lick of JS UI code on this page! (aside from a little bit of g-analytics)
     Everything in done in pure HTML + CSS (no ui-libraries) to keep things light and fast
 
-    Sometimes the best code is no code at all.
+    "Sometimes the best code is no code at all."
+        - Anon
+            - Daniel Prilik
+                - Michael Scott
     -->
     <div class="container">
         <div class="aboutme">
-            <h1 style="margin-bottom: 16px;">Hey, I'm Daniel <span title="I bet you've never seen *that* last name before" style="color: #6699ff;">Prilik</span>!</h1>
+            <h1 style="margin-bottom: 16px;">Hi, I'm Daniel <span title="Having such a unique last name is great for getting an awesome personal website domain :D" style="color: #6699ff;">Prilik</span></h1>
             <h3>
                 I'm a 3rd year
                 <span style="color: #ff63aa;" title="Mathematics REPRESENT">Software</span>
@@ -31,29 +34,30 @@
                 student at the University of Waterloo.
             </h3>
             <br>
-            <p>
-                At the moment, I'm really interested in <b>low-level systems</b>, so things like <b>emulation</b>, <b>assembly programming</b>, and <b>operating systems</b>.
-            </p>
+            <p>As a co-op student, I've gotten the chance to work at a bunch of really awesome companies! In the past, i've done...</p>
             <br>
-            <p>
-                In the past, I've worked as a <b>web developer</b> <a href="https://polar.me/">here</a> and <a href="https://www.lcbonext.com/">here</a>, and have also worked as a <b>game developer</b> on some <a href="https://thecoalitionstudio.com/">larger</a> and <a href="http://1212.rocks">smaller</a> titles.
-                Check out my <a href="resume/Daniel_Prilik_Resume_W2017.pdf">resume</a> for details!
-            </p>
+            <ul>
+                <li><b>Software Engineering</b> at <a href="https://www.apple.com/"><i>Apple</i></a></li>
+                <li><b>AAA Game Development</b> on <i>Gears 5</i> at <i><a href="https://thecoalitionstudio.com">The Coalition (Microsoft)</a></i></li>
+                <li><b>Full-Stack Web Development</b> at <i><a href="https://www.lcbonext.com/">LCBO|next</a> </i>and <i><a href="https://polar.me/">Polar</a></i></li>
+            </ul>
             <br>
-            <p>Below you'll find a <em>generally</em> up-to-date list of projects I've worked on over the years.</p>
+            <p>I'm always interested in learning more about different aspects of software engineering. At the moment, I'm particularly interested in topics such as <b>emulation</b>,<b> bare-metal programming</b>,<b> </b>and<b> </b><b>OS dev</b>.</p>
             <br>
+            <p>When I'm not studying, working, or unwinding, I'll make some time to work on <b>side-projects</b> that I find interesting.</p>
+            <p>You can find links and info to some of the more interesting projects I've worked on below.</p>
             <br>
-            <div>And hey, if anything catches your eye and you're interested in getting in touch...</div>
+            <p>And hey, if anything here catches your eye and you're interested in getting in touch, I'd love to talk!</p>
             <br>
             <p>Email: <a href="mailto:daniel@prilik.com">daniel@prilik.com</a></p>
             <p>GitHub: <a href="https://github.com/daniel5151">daniel5151</a></p>
         </div>
         <div class="resume">
-            <p><em>Psst...</em> are you looking for a solid developer?</p>
-            <p>Check out my <a href="resume/Daniel_Prilik_Resume_W2017.pdf"><em>Resume</em></a> :)</p>
+            <p><em>Psst...</em> in the market for a great Developer?</p>
+            <p>Check out my <a href="resume/Daniel_Prilik_Resume_W2017.pdf"><em>Resume!</em></a></p>
         </div>
 
-        <h1>Big Projects</h1>
+        <h1>Big Projects - Emulators</h1>
         <div class="projects big-projects">
             <div class="card">
                 <div class="corner-ribbon">WIP</div>
@@ -63,9 +67,33 @@
                     <div class="year">2017+</div>
                 </a>
                 <div class="outer-text">
-                    <div class="inner-text">AKA: <em>Another NES Emulator,</em><br> is my cross-platform NES Emulator written in C++ and SDL2. The plan is to support most popular NES titles!</div>
+                    <div class="inner-text">AKA: <em>Another NES Emulator.</em><br> A NES Emulator written in C++11. <br>It is fully cross-platform, and plays most popular NES titles!</div>
                 </div>
             </div>
+            <div class="card">
+                <a href="https://github.com/daniel5151/chip8">
+                    <div class="title"><span>AC8E</span></div>
+                    <div class="img-container"><img src="landing_site_resources/thumbs/chip8.png"></div>
+                    <div class="year">2017</div>
+                </a>
+                <div class="outer-text">
+                    <div class="inner-text">AKA: <em>Another CHIP-8 Emulator.</em><br> A CHIP-8 Emulator written to get a feel for emulator development, and to explore programming in Rust.</div>
+                </div>
+            </div>
+            <div class="card">
+                <a href="mips241/">
+                    <div class="title"><span>mips241</span></div>
+                    <div class="img-container"><img src="landing_site_resources/thumbs/mips241.png"></div>
+                    <div class="year">2016</div>
+                </a>
+                <div class="outer-text">
+                    <div class="inner-text">A simple emulator for the simplified MIPS VM used in uwaterloo's CS 241.<br> It includes a fully interactive debugger! <br> Written in C++11</div>
+                </div>
+            </div>
+        </div>
+
+        <h1>Big Projects - Web</h1>
+        <div class="projects big-projects">
             <div class="card">
                 <a href="http://1212.rocks">
                     <div class="title"><span>1212!</span></div>
@@ -77,43 +105,23 @@
                 </div>
             </div>
             <div class="card">
-                <a href="https://github.com/daniel5151/chip8">
-                    <div class="title"><span>AC8E</span></div>
-                    <div class="img-container"><img src="landing_site_resources/thumbs/chip8.png"></div>
-                    <div class="year">2017</div>
-                </a>
-                <div class="outer-text">
-                    <div class="inner-text">AKA: <em>Another CHIP-8 Emulator,</em><br> is a CHIP-8 Emulator I wrote to get a feel for emulator development, and to explore programming in Rust.</div>
-                </div>
-            </div>
-            <div class="card">
-                <a href="mips241/">
-                    <div class="title"><span>mips241</span></div>
-                    <div class="img-container"><img src="landing_site_resources/thumbs/mips241.png"></div>
-                    <div class="year">2016</div>
-                </a>
-                <div class="outer-text">
-                    <div class="inner-text">A emulator for the version of MIPS assembly we used in CS 241.<br> Includes a fully interactive debugger! <br> Written in C++</div>
-                </div>
-            </div>
-            <div class="card">
                 <a href="dicesiege/">
                     <div class="title"><span>DiceSiege</span></div>
                     <div class="img-container"><img src="landing_site_resources/thumbs/map.png"></div>
                     <div class="year">2015</div>
                 </a>
                 <div class="outer-text">
-                    <div class="inner-text">A demo of a fully custom procedural map generation engine I wrote for a Risk-like strategy game that was (sadly) never completed. Rendered with Two.js</div>
+                    <div class="inner-text">A small demo of a procedural map generation engine I wrote for a Risk-like strategy game. Rendered with Two.js.</div>
                 </div>
             </div>
             <div class="card">
                 <a href="physics/index.html">
-                    <div class="title"><span>Basic Physics Sim</span></div>
+                    <div class="title"><span>Simple Physics Sim</span></div>
                     <div class="img-container"><img src="landing_site_resources/thumbs/phys.png"></div>
                     <div class="year">2013-2014</div>
                 </a>
                 <div class="outer-text">
-                    <div class="inner-text">A basic physics sandbox written when I first started learning JS. It isn't terribly accurate or pretty, but it was a great project to learn JS with :)</div>
+                    <div class="inner-text">A simple physics sandbox written when I first started learning JS. It isn't terribly accurate or pretty, but it was a great project to learn JS with :)</div>
                 </div>
             </div>
         </div>
@@ -258,9 +266,9 @@
         </div>
 
         <div class="pre-contact">
-            <p>Anything piqued your interest? <br> Or maybe you just want to talk?</p>
+            <p>So, anything pique your interest?</p>
             <br>
-            <h2>Contact Me!</h2>
+            <p style="font-size: 1.5em;"><b>Contact Me!</b></p>
         </div>
 
         <div class="contact">
@@ -272,6 +280,7 @@
             </p>
         </div>
     </div>
+    <!-- Just a little bit of tracking... Sorry! -->
     <script async="" src="//www.google-analytics.com/analytics.js"></script><script>
     (function(i, s, o, g, r, a, m) {
         i['GoogleAnalyticsObject'] = r;
